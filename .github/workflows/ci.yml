@@ -1,0 +1,153 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# Format, build (analysers and CA1502 complexity, warnings as errors),
+# unit tests on three operating systems, the vulnerable-package audit,
+# and the conformance kit against a real `pain001 serve`.
+name: CI
+
+on:
+  push:
+    branches: [main, "feat/*"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+
+jobs:
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: dotnet format --verify-no-changes
+        run: dotnet format Pain001.Sdk.sln --verify-no-changes
+
+  build-test:
+    name: Build and unit tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Build (Release, warnings as errors)
+        run: dotnet build Pain001.Sdk.sln -c Release
+
+      - name: Unit tests (server tests skip without PAIN001_BASE_URL)
+        run: dotnet test Pain001.Sdk.sln -c Release --no-build
+
+      - name: Pack (checked, never published)
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet pack src/Pain001.Sdk/Pain001.Sdk.csproj -c Release --no-build -o artifacts
+
+  audit:
+    name: Vulnerable packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: dotnet list package --vulnerable
+        run: |
+          set -euo pipefail
+          dotnet restore Pain001.Sdk.sln
+          out="$(dotnet list Pain001.Sdk.sln package --vulnerable --include-transitive 2>&1)"
+          echo "$out"
+          if echo "$out" | grep -q "has the following vulnerable packages"; then
+            exit 1
+          fi
+
+  conformance:
+    name: Conformance kit against pain001 serve
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Install the server (hash-pinned)
+        run: |
+          python -m venv "$RUNNER_TEMP/srv"
+          "$RUNNER_TEMP/srv/bin/pip" install --require-hashes --no-deps -r ci/server-requirements.txt
+
+      - name: Start pain001 serve
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          nohup "$RUNNER_TEMP/srv/bin/pain001" serve --host 127.0.0.1 --port 8000 > "$RUNNER_TEMP/server.log" 2>&1 &
+          for _ in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8000/api/v1/health > /dev/null; then
+              echo "server is up"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/server.log"
+          exit 1
+
+      - name: Build
+        run: dotnet build Pain001.Sdk.sln -c Release
+
+      - name: Conformance and typed tests
+        env:
+          PAIN001_BASE_URL: http://127.0.0.1:8000
+        run: dotnet test Pain001.Sdk.sln -c Release --no-build --logger "console;verbosity=normal"
+
+      - name: Example generates the credit transfer
+        env:
+          PAIN001_BASE_URL: http://127.0.0.1:8000
+        run: |
+          set -euo pipefail
+          dotnet run --project examples/Basic -c Release --no-build -- \
+            conformance/fixtures/credit-transfer.pain.001.001.09.csv "$RUNNER_TEMP/out.xml"
+          grep -q '<NbOfTxs>5</NbOfTxs>' "$RUNNER_TEMP/out.xml"
+
+      - name: Server log
+        if: always()
+        run: cat "$RUNNER_TEMP/server.log" || true
