@@ -1,0 +1,15 @@
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
+<Project>
+  <!-- Central package management: every package version is pinned here,
+       exactly, and nowhere else. The library itself has no third-party
+       runtime dependency; these are test-only packages. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="[18.11.0]" />
+    <PackageVersion Include="xunit" Version="[2.9.3]" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="[3.1.5]" />
+  </ItemGroup>
+</Project>

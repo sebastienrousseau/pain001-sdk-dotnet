@@ -1,0 +1,19 @@
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
+<Project>
+  <!-- Settings every project in the repository shares: the library, the
+       tests and the example are held to the same compiler and analyser
+       gate. -->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- CA1502 reads its cyclomatic complexity threshold from here. -->
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeMetricsConfig.txt" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,34 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pain001.Sdk", "src\Pain001.Sdk\Pain001.Sdk.csproj", "{1F0B6D0E-4E3A-4C59-9F0B-7D1A8C2E5A01}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pain001.Sdk.Tests", "tests\Pain001.Sdk.Tests\Pain001.Sdk.Tests.csproj", "{2A7C1E4B-8D2F-4B6A-A3E1-5C9D0F7B6B02}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basic", "examples\Basic\Basic.csproj", "{3B8D2F5C-9E3A-4C7B-B4F2-6DAE1A8C7C03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F0B6D0E-4E3A-4C59-9F0B-7D1A8C2E5A01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0B6D0E-4E3A-4C59-9F0B-7D1A8C2E5A01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0B6D0E-4E3A-4C59-9F0B-7D1A8C2E5A01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0B6D0E-4E3A-4C59-9F0B-7D1A8C2E5A01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A7C1E4B-8D2F-4B6A-A3E1-5C9D0F7B6B02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A7C1E4B-8D2F-4B6A-A3E1-5C9D0F7B6B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A7C1E4B-8D2F-4B6A-A3E1-5C9D0F7B6B02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A7C1E4B-8D2F-4B6A-A3E1-5C9D0F7B6B02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B8D2F5C-9E3A-4C7B-B4F2-6DAE1A8C7C03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B8D2F5C-9E3A-4C7B-B4F2-6DAE1A8C7C03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B8D2F5C-9E3A-4C7B-B4F2-6DAE1A8C7C03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B8D2F5C-9E3A-4C7B-B4F2-6DAE1A8C7C03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
