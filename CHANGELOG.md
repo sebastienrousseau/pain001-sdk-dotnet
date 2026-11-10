@@ -1,0 +1,39 @@
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This package's version follows the [`pain001`](https://github.com/sebastienrousseau/pain001)
+suite; the first release will be `0.0.86`, in lockstep with it.
+
+## [Unreleased]
+
+### Added
+
+- `Pain001Client`, a typed async client for the pain001 REST API:
+  `HealthAsync`, `ValidateAsync`, `GenerateAsync`, `CheckAsync`,
+  `FacesAsync`, `ProjectFaceAsync` and the low-level `RequestAsync`,
+  with `CancellationToken` on every call, an optional bearer API key and
+  a per-request timeout. No third-party runtime dependency.
+- `Pain001ApiException`, carrying the HTTP status and the server's
+  `detail`; its message never includes the detail, which can echo
+  payment data.
+- Response records with snake_case JSON mapping (row errors as
+  pain001's `RowError` `{field, message, value}`; HTTP 422 items as
+  FastAPI's `ValidationError`), and `MessageTypes`
+  constants for the 13 message types the server lists.
+- The conformance kit, vendored from core 0.0.86 and pinned by
+  `conformance/SHA256SUMS`, with a runner that ports core's reference
+  runner, typed tests for every method, and unit tests against an
+  in-memory handler.
+- CI: format, build and unit tests on Linux, Windows and macOS, a
+  vulnerable-package audit, and a conformance job against a
+  hash-pinned `pain001 serve` 0.0.85.
+- An example console project, `examples/Basic`, that generates a
+  pain.001.001.09 file from the kit's credit-transfer fixture.
+- Community baseline: README, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT,
+  AGENTS, CITATION, DCO, issue forms, a pull request template, and DCO
+  and markdownlint workflows.
