@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# Test-project scoping of library analyser rules that conflict with
+# xUnit's own conventions. Each line says why.
+
+[*.cs]
+# xUnit1030 forbids ConfigureAwait(false) in tests; CA2007 asks for it.
+dotnet_diagnostic.CA2007.severity = none
+# xUnit discovers only public test classes; CA1515 asks to make them internal.
+dotnet_diagnostic.CA1515.severity = none
+# xUnit test methods are instance methods by design.
+dotnet_diagnostic.CA1822.severity = none
