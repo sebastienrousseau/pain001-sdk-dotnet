@@ -1,0 +1,19 @@
+# .NET build output
+bin/
+obj/
+artifacts/
+TestResults/
+*.user
+*.suo
+.vs/
+.idea/
+*.nupkg
+*.snupkg
+
+# Example output
+examples/Basic/*.xml
+
+# Tooling
+node_modules/
+.venv/
+.DS_Store
