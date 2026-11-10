@@ -13,6 +13,9 @@ suite; the first release will be `0.0.86`, in lockstep with it.
 
 ### Added
 
+- Target `net10.0` only. .NET 8 and .NET 9 reached end of support on
+  10 November 2026; .NET 10 is the supported LTS release (to November
+  2028).
 - `Pain001Client`, a typed async client for the pain001 REST API:
   `HealthAsync`, `ValidateAsync`, `GenerateAsync`, `CheckAsync`,
   `FacesAsync`, `ProjectFaceAsync` and the low-level `RequestAsync`,

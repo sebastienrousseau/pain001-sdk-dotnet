@@ -16,7 +16,7 @@
   <a href="#documentation"><img src="https://img.shields.io/badge/docs-XML%20doc%20comments-blue?style=for-the-badge&labelColor=555555&logo=dotnet" alt="Docs" height="28" /></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/pain001-sdk-dotnet"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/pain001-sdk-dotnet?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" height="28" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=for-the-badge" alt="License: Apache-2.0 OR MIT" height="28" /></a>
-  <a href="#requirements"><img src="https://img.shields.io/badge/.NET-8%20%7C%2010-93450a.svg?style=for-the-badge&logo=dotnet" alt=".NET 8 or .NET 10" height="28" /></a>
+  <a href="#requirements"><img src="https://img.shields.io/badge/.NET-10-93450a.svg?style=for-the-badge&logo=dotnet" alt=".NET 10" height="28" /></a>
 </p>
 
 <p align="center">
@@ -89,9 +89,10 @@ pain001 serve --host 127.0.0.1 --port 8000
 
 ## Requirements
 
-- The library targets `net8.0` and `net10.0`.
-- Building the repository needs the .NET 10 SDK; running the tests on
-  both targets also needs the .NET 8 runtime.
+- The library targets `net10.0`, the current LTS release (supported to
+  November 2028). .NET 8 and .NET 9 reached end of support on
+  10 November 2026, so they are not targeted.
+- Building the repository needs the .NET 10 SDK.
 - A pain001 server (`pain001 serve`) reachable over HTTP. CI tests
   against pain001 0.0.85.
 - CI builds and tests on Linux, Windows and macOS.
@@ -284,7 +285,7 @@ The version is `0.0.x` and moves by `0.0.1` in lockstep with the pain001
 suite; before `1.0` any release may change the API, and the
 [CHANGELOG](CHANGELOG.md) says how. SDK version 0.0.N vendors the
 conformance kit from core 0.0.N, and CI fails if any case fails against
-the server. The `net8.0` floor moves only with a release that says so.
+the server. The `net10.0` floor moves only with a release that says so.
 
 ---
 

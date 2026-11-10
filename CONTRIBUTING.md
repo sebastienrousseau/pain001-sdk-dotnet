@@ -9,8 +9,7 @@ drift.
 
 ## Before you open a pull request
 
-You need the .NET 10 SDK (it builds both the `net8.0` and `net10.0`
-targets) and, to run the tests, the .NET 8 runtime as well.
+You need the .NET 10 SDK; the library and tests target `net10.0`.
 
 ```sh
 make check          # format, build, unit tests, vulnerable-package audit
