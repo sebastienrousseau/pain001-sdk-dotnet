@@ -34,7 +34,7 @@ suite; the first release will be `0.0.86`, in lockstep with it.
   in-memory handler.
 - CI: format, build and unit tests on Linux, Windows and macOS, a
   vulnerable-package audit, and a conformance job against a
-  hash-pinned `pain001 serve` 0.0.85.
+  hash-pinned `pain001 serve` 0.0.86.
 - An example console project, `examples/Basic`, that generates a
   pain.001.001.09 file from the kit's credit-transfer fixture.
 - Community baseline: README, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT,
