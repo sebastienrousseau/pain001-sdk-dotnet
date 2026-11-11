@@ -13,6 +13,8 @@
     <!-- Record every resolved package and its content hash in a
          packages.lock.json beside each project. -->
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <!-- In CI a restore that would change a lock file fails instead. -->
+    <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
 
   <ItemGroup>

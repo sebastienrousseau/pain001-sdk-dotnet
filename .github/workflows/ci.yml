@@ -86,13 +86,6 @@ jobs:
             exit 1
           fi
 
-      - name: Upload the generated lock files
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: nuget-lock-files
-          path: "**/packages.lock.json"
-          retention-days: 5
-
   conformance:
     name: Conformance kit against pain001 serve
     runs-on: ubuntu-latest
