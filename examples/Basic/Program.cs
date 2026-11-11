@@ -11,7 +11,7 @@
 using Pain001.Sdk;
 
 string baseUrl = Environment.GetEnvironmentVariable("PAIN001_BASE_URL") ?? "http://127.0.0.1:8000";
-string input = args.Length > 0 ? args[0] : Path.Combine("conformance", "fixtures", "credit-transfer.pain.001.001.09.csv");
+string input = args.Length > 0 ? args[0] : Path.Join("conformance", "fixtures", "credit-transfer.pain.001.001.09.csv");
 string output = args.Length > 1 ? args[1] : "credit-transfer.pain.001.001.09.xml";
 
 using var client = new Pain001Client(new Uri(baseUrl), Environment.GetEnvironmentVariable("PAIN001_API_KEY"));

@@ -12,7 +12,7 @@ public sealed class KitTests
     [Fact]
     public void EveryKitFileMatchesItsPinnedHash()
     {
-        string pinned = File.ReadAllText(Path.Combine(Kit.Root, "SHA256SUMS"));
+        string pinned = File.ReadAllText(Path.Join(Kit.Root, "SHA256SUMS"));
 
         Assert.Equal(pinned, ComputeSums(Kit.Root));
     }
@@ -52,7 +52,7 @@ public sealed class KitTests
         var listing = new System.Text.StringBuilder();
         foreach (string relative in paths)
         {
-            byte[] hash = SHA256.HashData(File.ReadAllBytes(Path.Combine(root, relative)));
+            byte[] hash = SHA256.HashData(File.ReadAllBytes(Path.Join(root, relative)));
             foreach (byte b in hash)
             {
                 listing.Append(b.ToString("x2", CultureInfo.InvariantCulture));

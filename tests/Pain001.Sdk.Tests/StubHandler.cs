@@ -28,10 +28,11 @@ internal sealed class StubHandler : HttpMessageHandler
 
     /// <summary>A handler that answers every request with this status and body.</summary>
     internal static StubHandler Answer(HttpStatusCode status, string body, string mediaType = "application/json") =>
-        new(_ => Task.FromResult(new HttpResponseMessage(status)
-        {
-            Content = new StringContent(body, Encoding.UTF8, mediaType),
-        }));
+        new(_ => Task.FromResult(Response(status, body, mediaType)));
+
+    // The response is returned to HttpClient, which owns and disposes it.
+    private static HttpResponseMessage Response(HttpStatusCode status, string body, string mediaType) =>
+        new(status) { Content = new StringContent(body, Encoding.UTF8, mediaType) };
 
     /// <summary>A handler that never answers, until the request is cancelled.</summary>
     internal static StubHandler Hang() =>
