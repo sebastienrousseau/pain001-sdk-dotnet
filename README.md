@@ -94,7 +94,7 @@ pain001 serve --host 127.0.0.1 --port 8000
   10 November 2026, so they are not targeted.
 - Building the repository needs the .NET 10 SDK.
 - A pain001 server (`pain001 serve`) reachable over HTTP. CI tests
-  against pain001 0.0.86.
+  against pain001 0.0.87, the latest released core.
 - CI builds and tests on Linux, Windows and macOS.
 
 ---

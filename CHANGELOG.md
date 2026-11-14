@@ -13,6 +13,14 @@ suite; the first release will be `0.0.86`, in lockstep with it.
 
 ### Changed
 
+- The vendored conformance kit is kit 2, byte-identical to core's
+  (pinned by `conformance/SHA256SUMS`): new cases
+  `generate-refused-rows`, `generate-refused-scheme`,
+  `validate-bad-lei` and `validate-chaps-purpose-required`, and their
+  fixtures. The CI conformance job runs it against the latest released
+  core, `pain001 serve` 0.0.87, re-locked with hashes in
+  `ci/server-requirements.txt`.
+
 - The README shows a demo, `.github/demo.gif`, rendered by `make demo`
   from `.github/demo.tape`: the Basic example against a real
   `pain001 serve` on loopback. `examples/Basic` now also prints the
