@@ -1,0 +1,27 @@
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <!-- BenchmarkDotNet needs optimised code and full PDBs. -->
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Pain001.Sdk/Pain001.Sdk.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Real answers from pain001 serve 0.0.87 to the kit's fixtures, and
+         the fixtures themselves, copied beside the binary. -->
+    <None Include="responses/*.json" CopyToOutputDirectory="PreserveNewest" LinkBase="responses" />
+    <None Include="../../conformance/fixtures/credit-transfer.pain.001.001.09.*" CopyToOutputDirectory="PreserveNewest" LinkBase="fixtures" />
+  </ItemGroup>
+</Project>

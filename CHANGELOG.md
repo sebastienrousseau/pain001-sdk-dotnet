@@ -37,6 +37,14 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- BenchmarkDotNet benchmarks (`benchmarks/Pain001.Sdk.Benchmarks`,
+  BenchmarkDotNet 0.15.8): the client-side cost of every typed method and
+  `RequestAsync` with the kit's fixtures and recorded server answers, no
+  network; and one loopback round trip per method to `pain001 serve`
+  when `PAIN001_BASE_URL` is set. `make bench` runs them; `make
+  bench-smoke` (one iteration each) runs in the CI conformance job.
+  Lock file added.
+
 - The complexity ceilings of the portfolio standard, enforced on every
   method by the build and CI: cyclomatic complexity 10 (CA1502, as
   before), cognitive complexity 15, 60 lines per method and 500 per file

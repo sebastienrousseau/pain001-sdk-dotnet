@@ -2,13 +2,14 @@
 <Project>
   <!-- Central package management: every package version is pinned here,
        exactly, and nowhere else. The library itself has no third-party
-       runtime dependency; these are test packages and a build-time
-       analyser. -->
+       runtime dependency; these are test, benchmark and build-time
+       analyser packages. -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageVersion Include="BenchmarkDotNet" Version="[0.15.8]" />
     <PackageVersion Include="coverlet.msbuild" Version="[10.1.0]" />
     <PackageVersion Include="FsCheck" Version="[3.6.0]" />
     <PackageVersion Include="FsCheck.Xunit" Version="[3.6.0]" />

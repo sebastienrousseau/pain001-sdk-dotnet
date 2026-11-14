@@ -177,6 +177,11 @@ jobs:
           PAIN001_KEYED_API_KEY: ci-example-key
         run: scripts/run-examples.sh
 
+      - name: Benchmark smoke run (one iteration each, not asserted)
+        env:
+          PAIN001_BASE_URL: http://127.0.0.1:8000
+        run: make bench-smoke
+
       - name: Server logs
         if: always()
         run: cat "$RUNNER_TEMP/server.log" "$RUNNER_TEMP/keyed.log" || true

@@ -10,7 +10,7 @@
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test coverage audit verify-versions conformance examples demo docs-lint halstead
+.PHONY: check format format-fix build test coverage audit verify-versions conformance examples bench bench-smoke demo docs-lint halstead
 
 check: format build coverage audit verify-versions halstead
 
@@ -49,6 +49,17 @@ conformance: build
 # Every example in examples/, against PAIN001_BASE_URL.
 examples: build
 	CONFIG=$(CONFIG) scripts/run-examples.sh
+
+# BenchmarkDotNet: the client-side benchmarks, and the loopback ones
+# when PAIN001_BASE_URL is set. Results land in artifacts/benchmarks/.
+BENCH := dotnet run -c $(CONFIG) --no-build --project benchmarks/Pain001.Sdk.Benchmarks --
+
+bench: build
+	$(BENCH) --artifacts artifacts/benchmarks
+
+# One iteration of each (BenchmarkDotNet's Dry job): kept running, not measured.
+bench-smoke: build
+	$(BENCH) --job Dry --artifacts artifacts/benchmarks-smoke
 
 # Renders .github/demo.gif from .github/demo.tape against a real
 # `pain001 serve` on 127.0.0.1. The server is $PAIN001_SERVER, else
