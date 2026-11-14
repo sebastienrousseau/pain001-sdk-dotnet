@@ -12,15 +12,15 @@
 
 <p align="center">
   <a href="https://github.com/sebastienrousseau/pain001-sdk-dotnet/actions"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/pain001-sdk-dotnet/ci.yml?style=for-the-badge&logo=github" alt="Build" height="28" /></a>
-  <a href="#install"><img src="https://img.shields.io/badge/NuGet-not%20yet%20published-lightgrey?style=for-the-badge&color=fc8d62&logo=nuget" alt="Registry" height="28" /></a>
-  <a href="#documentation"><img src="https://img.shields.io/badge/docs-XML%20doc%20comments-blue?style=for-the-badge&labelColor=555555&logo=dotnet" alt="Docs" height="28" /></a>
+  <a href="https://www.nuget.org/packages/Pain001.Sdk"><img src="https://img.shields.io/nuget/v/Pain001.Sdk?style=for-the-badge&color=fc8d62&logo=nuget" alt="Registry" height="28" /></a>
+  <a href="https://sebastienrousseau.github.io/pain001-sdk-dotnet/api/"><img src="https://img.shields.io/badge/docs-API%20reference-blue?style=for-the-badge&labelColor=555555&logo=dotnet" alt="Docs" height="28" /></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/pain001-sdk-dotnet"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/pain001-sdk-dotnet?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" height="28" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=for-the-badge" alt="License: Apache-2.0 OR MIT" height="28" /></a>
-  <a href="#requirements"><img src="https://img.shields.io/badge/.NET-10-93450a.svg?style=for-the-badge&logo=dotnet" alt=".NET 10" height="28" /></a>
+  <a href="https://github.com/sebastienrousseau/pain001-sdk-dotnet/blob/main/docs/POLICIES.md"><img src="https://img.shields.io/badge/.NET-10-93450a.svg?style=for-the-badge&logo=dotnet" alt=".NET 10 or later" height="28" /></a>
 </p>
 
 <p align="center">
-  <!-- No .github/demo.gif yet: a recording needs a running pain001 server, and this repository has no VHS recipe for it yet. -->
+  <img src="https://raw.githubusercontent.com/sebastienrousseau/pain001-sdk-dotnet/main/.github/demo.gif" alt="The Basic example using the .NET SDK against pain001 serve on loopback: health check, validation of the conformance kit's synthetic CSV, and generation of an XSD-valid pain.001.001.09 file" width="100%" />
 </p>
 
 ---
@@ -29,27 +29,27 @@
 
 **Getting started**
 
-- [Install](#install): from source today; NuGet once released
+- [Install](#install): NuGet (`Pain001.Sdk`), or a project reference from source
 - [Requirements](#requirements): toolchain floor, platforms
 - [Quick Start](#quick-start): generate a pain.001 file from a CSV in a few lines
 
 **The pain001-sdk-dotnet ecosystem**
 
-- [The pain001-sdk-dotnet ecosystem](#the-pain001-sdk-dotnet-ecosystem): the pain001 server, its SDKs and the conformance kit
+- [The pain001-sdk-dotnet ecosystem](#the-pain001-sdk-dotnet-ecosystem): the pain001 server, its five SDKs and the conformance kit
 
 **Library reference**
 
 - [Capabilities at a glance](#capabilities-at-a-glance): the current surface by theme
-- [Ecosystem comparison](#ecosystem-comparison): not published yet, and why
-- [Benchmarks](#benchmarks): none, and why
-- [Features](#features): the client's methods and types
-- [Configuration](#configuration): base address, API key, timeout
+- [Ecosystem comparison](#ecosystem-comparison): short matrix; full table at [`docs/COMPARISON.md`](docs/COMPARISON.md)
+- [Benchmarks](#benchmarks): headline numbers; full table at [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md)
+- [Features](#features): module-level capability list
+- [Configuration](#configuration): core options
 - [Examples](#examples): runnable example index
 
 **Operational**
 
 - [When not to use pain001-sdk-dotnet](#when-not-to-use-pain001-sdk-dotnet): limitations
-- [Development](#development): make targets, CI
+- [Development](#development): make targets, fuzzing, CI
 - [Security](#security): guarantees and compliance
 - [Documentation](#documentation): all reference docs
 - [Stability guarantees](#stability-guarantees): SemVer axis, output stability, minimum toolchain discipline
@@ -61,27 +61,23 @@
 
 ### As a .NET library
 
-The package is **not yet on NuGet**. The first release, `0.0.86`, will
-ship in lockstep with the pain001 suite. Until then, reference the
-project from source:
-
 ```xml
-<ItemGroup>
-  <ProjectReference Include="path/to/pain001-sdk-dotnet/src/Pain001.Sdk/Pain001.Sdk.csproj" />
-</ItemGroup>
+<PackageReference Include="Pain001.Sdk" Version="0.0.88" />
 ```
 
-Once it is published, the reference will be:
+Or `dotnet add package Pain001.Sdk --version 0.0.88`. 0.0.88 is the
+first release; until it is on NuGet, reference the project from a
+clone:
 
 ```xml
-<PackageReference Include="Pain001.Sdk" Version="0.0.86" />
+<ProjectReference Include="path/to/pain001-sdk-dotnet/src/Pain001.Sdk/Pain001.Sdk.csproj" />
 ```
 
-You also need a running pain001 server, which is the Python package
-`pain001` with its `api` extra:
+The SDK calls a running pain001 server, the Python package `pain001`
+with its `api` extra:
 
 ```sh
-pip install 'pain001[api]'
+pip install 'pain001[api]==0.0.87'
 pain001 serve --host 127.0.0.1 --port 8000
 ```
 
@@ -89,12 +85,12 @@ pain001 serve --host 127.0.0.1 --port 8000
 
 ## Requirements
 
-- The library targets `net10.0`, the current LTS release (supported to
-  November 2028). .NET 8 and .NET 9 reached end of support on
-  10 November 2026, so they are not targeted.
-- Building the repository needs the .NET 10 SDK.
-- A pain001 server (`pain001 serve`) reachable over HTTP. CI tests
-  against pain001 0.0.86.
+- .NET 10 (`net10.0`), the supported LTS release (to November 2028).
+  .NET 8 and .NET 9 reached end of support on 10 November 2026 and are
+  not targeted ([policy](docs/POLICIES.md)).
+- No other package: the library depends on the base class library only.
+- A pain001 server reachable over HTTP. CI tests against pain001 0.0.87,
+  the latest released core.
 - CI builds and tests on Linux, Windows and macOS.
 
 ---
@@ -107,19 +103,26 @@ using Pain001.Sdk;
 using var client = new Pain001Client(new Uri("http://127.0.0.1:8000"));
 
 string csv = await File.ReadAllTextAsync("payments.csv");
-UiGenerateResponse result = await client.GenerateAsync(
-    csv, "payments.csv", MessageTypes.Pain001V09);
-
-if (result.Success)
+try
 {
+    UiGenerateResponse result = await client.GenerateAsync(csv, "payments.csv", MessageTypes.Pain001V09);
     await File.WriteAllTextAsync("payments.xml", result.Xml);
+}
+catch (Pain001GenerationRefusedException refused)
+{
+    foreach (RowError row in refused.Response.ValidationErrors ?? [])
+    {
+        Console.Error.WriteLine($"{row.Field}: {row.Message}");
+    }
 }
 ```
 
 The client posts the file's text to `POST /api/v1/ui/generate`; the
 server parses it in memory, validates every row and returns the XML
-inline. A row the server rejects raises `Pain001ApiException` with the
-HTTP status and the server's `detail`.
+inline. When the server refuses the data (a row fails validation or a
+scheme rule), `GenerateAsync` raises `Pain001GenerationRefusedException`,
+whose `Response` holds the findings; any other status outside 2xx raises
+`Pain001ApiException` with the HTTP status and the server's `detail`.
 
 ---
 
@@ -133,6 +136,7 @@ proves each client against a running server.
 | :--- | :--- | :--- |
 | [pain001](https://github.com/sebastienrousseau/pain001) | The engine: generates and validates pain.001 and pain.008, and serves the REST API | Run `pain001 serve` for this SDK to call |
 | pain001-sdk-dotnet | This repository: the .NET client | Call the API from C#, F# or any .NET language |
+| [pain001-sdk-go](https://github.com/sebastienrousseau/pain001-sdk-go), [-java](https://github.com/sebastienrousseau/pain001-sdk-java), [-rust](https://github.com/sebastienrousseau/pain001-sdk-rust), [-cpp](https://github.com/sebastienrousseau/pain001-sdk-cpp) | The same client surface in Go, Java, Rust and C++ | Call the API from those languages |
 | `conformance/` | The shared conformance kit, vendored from core | Prove this client against the server it describes |
 
 ---
@@ -142,36 +146,53 @@ proves each client against a running server.
 | Area | Capability | Status |
 | :--- | :--- | :--- |
 | Health | `HealthAsync`: server status and version | Available |
-| Validation | `ValidateAsync`: row counts and errors for a CSV, JSON or JSON Lines file | Available |
-| Generation | `GenerateAsync`: the XML document for a payment file | Available |
+| Validation | `ValidateAsync`: row counts, row errors and scheme violations for a CSV, JSON or JSON Lines file | Available |
+| Generation | `GenerateAsync`: the XML document for a payment file; refusals with their findings | Available |
 | Checking | `CheckAsync`: the XSD, MDR, scheme and Schematron ladder on an existing document | Available |
 | Faces | `FacesAsync`, `ProjectFaceAsync`: project a pain.001 into another format, with a loss report | Available |
 | Low level | `RequestAsync`: any method and path, status and raw JSON | Available |
-| Publication | NuGet package | Not yet published |
+| Resilience | Per-request timeout, cancellation, opt-in `RetryPolicy` for `GET` calls | Available |
+| Publication | NuGet package `Pain001.Sdk` | Release workflow ready; first publication with 0.0.88 |
 
 ---
 
 ## Ecosystem comparison
 
-Not published yet. A comparison with other .NET ISO 20022 libraries
-needs evidence this repository does not have; it will be added with
-that evidence rather than guessed.
+The suite's five SDKs share one method surface and run core's
+conformance kit against a live `pain001 serve` in CI. Core's CI also
+generates a Python client from the OpenAPI document, which it imports
+but does not run against the kit.
 
-| Project | Typed REST client | Conformance kit in CI | Third-party runtime dependencies |
+| Project | Language (minimum) | Conformance kit in CI | Types |
 | :--- | :---: | :---: | :---: |
-| **pain001-sdk-dotnet** | Yes | Yes | None |
+| pain001-sdk-go | Go 1.26 | Yes | Hand-written |
+| pain001-sdk-java | Java 17 | Yes | Hand-written |
+| pain001-sdk-rust | Rust 1.85 | Yes | Hand-written (serde) |
+| **pain001-sdk-dotnet** | **.NET 10** | **Yes** | **Hand-written** |
+| pain001-sdk-cpp | C++17 | Yes | Hand-written |
+| openapi-generator client (core CI artifact) | Python | No, CI imports it only | Generated |
+| Raw HTTP | Any | No | None |
+
+See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the evidence and complete matrix.
 
 ---
 
 ## Benchmarks
 
-None. Every call is one HTTP request to the server, so the time is the
-server's and the network's; a client-side benchmark would measure
-neither.
+What the SDK itself costs per call (request building and response
+decoding with the kit's fixtures, no network) and one loopback round
+trip to `pain001 serve` 0.0.87, measured with BenchmarkDotNet. The
+client's own cost is microseconds; the round trip is the server's work.
 
 | Scenario | Result | Environment |
 | :--- | ---: | :--- |
-| Not measured | n/a | n/a |
+| `GenerateAsync`, client side | 30.9 μs, 28.7 KB allocated | Apple A18 Pro, macOS 27.2, .NET 10.0.15 |
+| `ProjectFaceAsync`, client side | 50.1 μs, 49.3 KB allocated | Apple A18 Pro, macOS 27.2, .NET 10.0.15 |
+| `HealthAsync`, client side | 1.9 μs, 2.8 KB allocated | Apple A18 Pro, macOS 27.2, .NET 10.0.15 |
+| `GenerateAsync`, loopback round trip | 55.6 ms mean, 49.7 ms median | Same machine, pain001 serve 0.0.87 on 127.0.0.1 |
+| `ValidateAsync`, loopback round trip | 11.8 ms mean, 10.0 ms median | Same machine, pain001 serve 0.0.87 on 127.0.0.1 |
+
+See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for methodology and full results.
 
 ---
 
@@ -188,11 +209,18 @@ neither.
 - `MessageTypes`: constants for the 13 message types the server lists.
   Every method takes the message type as a string, so a newer server's
   types work before this list knows them.
-- `Pain001ApiException`: the HTTP status and the server's `detail` (a
-  string, or an array of validation errors for HTTP 422).
+- Errors by cause ([ADR 0003](docs/adr/0003-error-model.md)):
+  `Pain001ApiException` (a status outside 2xx, with `StatusCode` and
+  `Detail`); `Pain001GenerationRefusedException`, derived from it, for a
+  refused generate call, with the findings in `Response`;
+  `Pain001NoDocumentException` for a 2xx generate answer without the
+  XML, so a returned result always has it. Messages never carry the
+  detail or a finding.
+- `RetryPolicy`: opt-in retries for `GET` calls only, off by default
+  ([ADR 0004](docs/adr/0004-opt-in-retries-for-get-only.md)).
 - `RequestAsync`: the low-level call the conformance runner uses. It
   returns any status instead of throwing.
-- No retries, no logging, and no third-party runtime dependency.
+- No logging, and no third-party runtime dependency.
 
 ---
 
@@ -204,6 +232,7 @@ var options = new Pain001ClientOptions
     BaseAddress = new Uri("https://pain001.internal.example"),
     ApiKey = Environment.GetEnvironmentVariable("PAIN001_API_KEY"),
     Timeout = TimeSpan.FromSeconds(10),
+    Retry = new RetryPolicy { MaxAttempts = 3 },
 };
 using var client = new Pain001Client(httpClient, options);
 ```
@@ -213,6 +242,8 @@ using var client = new Pain001Client(httpClient, options);
 | `BaseAddress` | `http://127.0.0.1:8000` | The server's absolute address; a path prefix is kept |
 | `ApiKey` | none | Sent as `Authorization: Bearer <key>` |
 | `Timeout` | 30 seconds | Per request; exceeding it raises `TimeoutException` |
+| `Retry` | none | A `RetryPolicy` for `GET` calls only (health, faces, a raw `GET`): `MaxAttempts` (3), `InitialDelay` (200 ms), `MaxDelay` (5 s); retries 429, 503 and connection errors with jittered exponential backoff, honouring `Retry-After`. A `POST` is never retried |
+| `TimeProvider` | `TimeProvider.System` | The clock for retry waits and `Retry-After` dates |
 
 The client never changes the settings of an `HttpClient` you pass in,
 and does not dispose it.
@@ -221,9 +252,24 @@ and does not dispose it.
 
 ## Examples
 
-| Example | What it does | Run it |
+Each example is a console project that checks its own result. CI runs
+every one against `pain001 serve` (`scripts/run-examples.sh`); run them
+from the repository root, with `PAIN001_BASE_URL` pointing at a server
+(default `http://127.0.0.1:8000`) and, optionally, `PAIN001_API_KEY`.
+
+| Example | Shows | Run it |
 | :--- | :--- | :--- |
-| [`examples/Basic`](examples/Basic/Program.cs) | Generates a pain.001.001.09 file from the kit's synthetic credit-transfer CSV | `PAIN001_BASE_URL=http://127.0.0.1:8000 dotnet run --project examples/Basic` |
+| [`Basic`](examples/Basic/Program.cs) | Health, validation and generation in one go: the README demo | `dotnet run --project examples/Basic` |
+| [`Health`](examples/Health/Program.cs) | `HealthAsync`: server status and version | `dotnet run --project examples/Health` |
+| [`Validate`](examples/Validate/Program.cs) | `ValidateAsync`: row counts, a rejected IBAN (HTTP 400), the `uk-chaps` scheme's violations | `dotnet run --project examples/Validate` |
+| [`Generate`](examples/Generate/Program.cs) | `GenerateAsync`: write the XML to a file | `dotnet run --project examples/Generate -- out.xml` |
+| [`Check`](examples/Check/Program.cs) | `CheckAsync`: the validation ladder on an existing document | `dotnet run --project examples/Check` |
+| [`Faces`](examples/Faces/Program.cs) | `FacesAsync`: the faces and their bindings | `dotnet run --project examples/Faces` |
+| [`ProjectFace`](examples/ProjectFace/Program.cs) | `ProjectFaceAsync`: a face payload and its loss report | `dotnet run --project examples/ProjectFace -- berlin_group` |
+| [`RawRequest`](examples/RawRequest/Program.cs) | `RequestAsync`: any method and path, status returned, never thrown | `dotnet run --project examples/RawRequest` |
+| [`ErrorHandling`](examples/ErrorHandling/Program.cs) | `Pain001GenerationRefusedException`, `Pain001ApiException` and `Pain001NoDocumentException`, caught in the right order | `dotnet run --project examples/ErrorHandling` |
+| [`Timeouts`](examples/Timeouts/Program.cs) | `Timeout`, a `CancellationToken` and the opt-in `RetryPolicy` | `dotnet run --project examples/Timeouts` |
+| [`ApiKey`](examples/ApiKey/Program.cs) | `ApiKey` sent as a bearer token; a wrong key refused with HTTP 401 | `PAIN001_API_KEY=... dotnet run --project examples/ApiKey` |
 
 ---
 
@@ -231,36 +277,54 @@ and does not dispose it.
 
 - **You cannot run the pain001 server.** This SDK does not generate or
   validate anything itself; every call goes to `pain001 serve`.
-- **You need it from NuGet today.** It is not published yet.
-- **You need retries.** The SDK never resends a payment request; add
-  your own policy (for example with `IHttpClientFactory`) if you want
-  one, knowing a retried generation is a second request.
+- **You need a framework older than .NET 10.** The package targets
+  `net10.0` only.
+- **You need payment calls retried.** The opt-in `RetryPolicy` covers
+  `GET` calls only; the SDK never resends a `POST` (validate, generate,
+  check, a face projection). Add your own policy if you need one, knowing
+  a retried generation is a second request.
+- **You want an offline ISO 20022 library.** Use the server, or a
+  library that builds the XML in process; this is a client.
 
 ---
 
 ## Development
 
 ```bash
-make check          # format, build, unit tests, vulnerable-package audit
+make check          # format, build (analysers, complexity), 100% coverage, audit, versions, Halstead
 make conformance    # the kit and typed tests; needs PAIN001_BASE_URL
-make example        # run examples/Basic against PAIN001_BASE_URL
-make docs-lint      # markdownlint, as the docs-lint workflow runs it
+make examples       # run every example against PAIN001_BASE_URL
+make bench          # BenchmarkDotNet; loopback too when PAIN001_BASE_URL is set
+make regression     # all of it against a server it installs and starts
+make docs           # the manual, strict, with the API reference
+make docs-lint      # markdownlint, codespell, REUSE
 ```
 
 The build treats warnings as errors with the `latest-recommended` .NET
-analysers, and CA1502 (configured in `CodeMetricsConfig.txt`) holds
-every method to a cyclomatic complexity of 10. CI runs format, build and
-unit tests on Linux, Windows and macOS, the vulnerable-package audit,
-and the conformance kit against a hash-pinned `pain001 serve`.
+analysers; CA1502 and SonarAnalyzer hold every method to cyclomatic
+complexity 10, cognitive complexity 15 and 60 lines, and
+`scripts/halstead.py` to Halstead difficulty 30. Unit tests run under
+coverlet and fail below 100 % line and branch coverage; FsCheck
+properties drive every method with arbitrary server answers. There are
+no fuzz targets: the client parses only JSON, through
+`System.Text.Json`, and the properties cover its decoding. CI runs
+format, build and tests on Linux, Windows and macOS, the
+vulnerable-package audit, the conformance kit, every example and a
+benchmark smoke run against a hash-pinned `pain001 serve`.
+[DEVELOPMENT.md](DEVELOPMENT.md) maps every gate to its local command.
 
 ---
 
 ## Security
 
 The SDK logs nothing and never puts a request body in an exception
-message, because request bodies hold payment data. It has no
+message, because request bodies hold payment data: an exception's
+message names the status (and, for a refusal, the count of findings),
+while the server's detail stays in `Detail` and `Response`. It has no
 third-party runtime dependency, sends the API key only as a bearer
-token to the configured server, and never retries.
+token to the configured server, bounds every request with a timeout,
+and never retries a `POST`. A response that is not JSON, or not valid
+UTF-8, becomes a string, never an exception from inside the parser.
 
 Report vulnerabilities according to [`SECURITY.md`](SECURITY.md).
 
@@ -268,14 +332,16 @@ Report vulnerabilities according to [`SECURITY.md`](SECURITY.md).
 
 ## Documentation
 
-- Every public type and member carries XML documentation, shipped in the
+- [User manual](https://sebastienrousseau.github.io/pain001-sdk-dotnet/),
+  built from [`docs/`](docs/index.md).
+- [API reference](https://sebastienrousseau.github.io/pain001-sdk-dotnet/api/),
+  generated from the XML documentation comments, which also ship in the
   package for IDE tooltips.
+- [Developer docs](DEVELOPMENT.md): toolchain, every CI gate, test
+  layout, release model.
+- [Ecosystem map](docs/COMPARISON.md): the suite's SDKs side by side.
 - [`conformance/README.md`](conformance/README.md): the conformance kit
   and its case format.
-- [`conformance/openapi.json`](conformance/openapi.json): the server's
-  OpenAPI document at this kit version.
-- [`CONTRIBUTING.md`](CONTRIBUTING.md), [`AGENTS.md`](AGENTS.md),
-  [`SECURITY.md`](SECURITY.md), [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
@@ -283,13 +349,20 @@ Report vulnerabilities according to [`SECURITY.md`](SECURITY.md).
 
 The version is `0.0.x` and moves by `0.0.1` in lockstep with the pain001
 suite; before `1.0` any release may change the API, and the
-[CHANGELOG](CHANGELOG.md) says how. SDK version 0.0.N vendors the
+[CHANGELOG](CHANGELOG.md) says how. Each release runs package validation
+(ApiCompat) against the previous published package, so no break is
+accidental. Output stability: the same server answer decodes to the same
+records and raises the same exception types; a change to that mapping
+is breaking even when no signature moves. SDK version 0.0.N vendors the
 conformance kit from core 0.0.N, and CI fails if any case fails against
-the server. The `net10.0` floor moves only with a release that says so.
+the server. The `net10.0` floor moves only with a release that says so
+([policy](docs/POLICIES.md)).
 
 ---
 
 ## License
 
 Dual-licensed under [Apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT),
-at your option. See [LICENSE](LICENSE).
+at your option. See [LICENSE](LICENSE). Every file carries its licence
+in machine-readable form ([REUSE](https://reuse.software/), checked in
+CI).

@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# codespell, as the docs-lint workflow and pre-commit run it.
+[codespell]
+skip = ./.git,./.venv-lint,./.venv-docs,*/bin,*/obj,./artifacts,./site,./docs/api,*.lock.json,*.gif,./conformance,./ci/*.txt,./docs/requirements.txt,./benchmarks/Pain001.Sdk.Benchmarks/responses,./LICENSES,./LICENSE-APACHE
+check-hidden = true
+# "caf" is the start of "café" in a test of a Latin-1 body (ClientTests).
+ignore-words-list = caf

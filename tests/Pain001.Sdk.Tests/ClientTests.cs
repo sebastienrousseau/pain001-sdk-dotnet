@@ -78,6 +78,7 @@ public sealed class ClientTests
 
         Assert.True(result.IsValid);
         Assert.Equal(5, result.TotalRows);
+        Assert.Equal(5, result.ValidRows);
         Assert.Empty(result.Errors!);
         Assert.Null(result.SchemeViolations);
         Assert.Equal(HttpMethod.Post, handler.Last!.Method);
@@ -119,7 +120,10 @@ public sealed class ClientTests
 
         ValidationError item = Assert.Single(items);
         Assert.Equal("enum", item.ErrorType);
+        Assert.Equal("bad", item.Message);
         Assert.Equal("message_type", item.Location[1].GetString());
+        Assert.Equal("pain.999", item.Input!.Value.GetString());
+        Assert.Null(item.Context);
     }
 
     [Fact]
@@ -152,11 +156,16 @@ public sealed class ClientTests
 
         CheckResponse result = await client.CheckAsync("<x/>", schematron: "sepa");
 
+        Assert.Equal("pain.001.001.09", result.MessageType);
         Assert.False(result.Passed);
         Assert.Equal(1, result.Errors);
+        Assert.Equal(0, result.Warnings);
         Assert.Equal("xsd", Assert.Single(result.Rungs));
         CheckFinding finding = Assert.Single(result.Findings);
+        Assert.Equal("xsd", finding.Rung);
         Assert.Equal("r1", finding.Rule);
+        Assert.Equal("error", finding.Severity);
+        Assert.Equal("bad", finding.Message);
         Assert.Null(finding.Location);
         JsonNode sent = JsonNode.Parse(handler.Last!.Body!)!;
         Assert.Equal("<x/>", sent["xml"]!.GetValue<string>());
@@ -176,6 +185,7 @@ public sealed class ClientTests
 
         FaceInfo face = Assert.Single(faces);
         Assert.Equal("berlin_group", face.Name);
+        Assert.Equal("Berlin Group", face.Description);
         Assert.Empty(face.Bindings);
     }
 
@@ -196,9 +206,17 @@ public sealed class ClientTests
         FaceResponse result = await client.ProjectFaceAsync("uk open/banking", "<x/>", bindings: bindings);
 
         Assert.Equal("uk_open_banking", result.Face);
+        Assert.Equal("pain.001.001.09", result.Version);
         Assert.Equal(JsonValueKind.Object, result.Payload.ValueKind);
-        Assert.Equal(0.25, result.LossReport.LossRatio);
-        Assert.Equal("d", Assert.Single(result.LossReport.UnmappedPaths));
+        LossReport loss = result.LossReport;
+        Assert.Equal("uk_open_banking", loss.Face);
+        Assert.Equal(4, loss.TotalSourceElements);
+        Assert.Equal(3, loss.MappedCount);
+        Assert.Equal(1, loss.UnmappedCount);
+        Assert.False(loss.IsLossless);
+        Assert.Equal(0.25, loss.LossRatio);
+        Assert.Equal(["a", "b", "c"], loss.MappedPaths);
+        Assert.Equal("d", Assert.Single(loss.UnmappedPaths));
         Assert.Equal("/api/v1/faces/uk%20open%2Fbanking", handler.Last!.Uri!.AbsolutePath);
         JsonNode sent = JsonNode.Parse(handler.Last.Body!)!;
         Assert.Equal("<x/>", sent["xml"]!.GetValue<string>());
@@ -295,10 +313,28 @@ public sealed class ClientTests
         Assert.Equal("{\"\uFFFD\":1}", response.Body.GetString());
     }
 
-    [Fact]
-    public async Task AnEmptySuccessBodyIsAJsonError()
+    [Theory]
+    [InlineData(199)]
+    [InlineData(300)]
+    public async Task AStatusOutside2xxOnEitherSideIsAnApiError(int status)
     {
-        using var handler = StubHandler.Answer(HttpStatusCode.OK, string.Empty);
+        using var handler = StubHandler.AnswerBytes(status, Encoding.UTF8.GetBytes(HealthBody), "application/json");
+        using var http = new HttpClient(handler);
+        using Pain001Client client = StubHandler.Client(http);
+
+        var error = await Assert.ThrowsAsync<Pain001ApiException>(() => client.HealthAsync());
+
+        Assert.Equal(status, error.StatusCode);
+    }
+
+    // "null" pins the JSON null branch, which the FsCheck properties reach
+    // only when the generator happens to produce it.
+    [Theory]
+    [InlineData("")]
+    [InlineData("null")]
+    public async Task AnEmptySuccessBodyIsAJsonError(string body)
+    {
+        using var handler = StubHandler.Answer(HttpStatusCode.OK, body);
         using var http = new HttpClient(handler);
         using Pain001Client client = StubHandler.Client(http);
 

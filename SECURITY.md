@@ -7,11 +7,11 @@
 This SDK follows the [`pain001`](https://github.com/sebastienrousseau/pain001)
 suite cadence. While pre-`1.0`, the latest released `0.0.x` receives
 security fixes; older `0.0.x` versions do not. No version has been
-released yet: the first will be `0.0.86`, in lockstep with the suite.
+released yet: the first will be `0.0.88`, in lockstep with the suite.
 
 | Version | Status | Receives security fixes? |
 | :--- | :--- | :--- |
-| `0.0.86` | Unreleased, in development | Yes, once released |
+| `0.0.88` | Unreleased, in development | Yes, once released |
 
 ## Reporting a vulnerability
 
@@ -42,7 +42,7 @@ not parse XML, write files or run code from the server.
 | **Payment data in logs** | The SDK logs nothing. Request bodies are never written anywhere, and an API error's message names only the HTTP status: the server's `detail`, which can echo input, stays in `Pain001ApiException.Detail`. |
 | **API key** | Sent only as `Authorization: Bearer <key>` to the configured base address. Use `https` for any server that is not on loopback. |
 | **Hostile or broken server** | Responses are parsed with `System.Text.Json`; a non-JSON body becomes a string, never an exception from inside the parser. Every request has a timeout (30 seconds by default). |
-| **Retries** | None. A payment request is never sent twice by the SDK. |
+| **Retries** | Off by default. The opt-in `RetryPolicy` resends only `GET` requests (health, faces, a raw `GET`), which carry no payment data; a payment request (`POST`) is never sent twice by the SDK. |
 | **Dependencies** | No third-party runtime dependency: only the .NET base class library. Test packages are pinned exactly in `Directory.Packages.props`, and CI fails on any package `dotnet list package --vulnerable` reports. |
 
 ### Cryptography status

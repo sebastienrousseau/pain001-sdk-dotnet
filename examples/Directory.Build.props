@@ -1,0 +1,18 @@
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
+<Project>
+  <!-- Every example is a console project on the SDK, sharing
+       Shared/Example.cs, and is held to the repository's compiler and
+       analyser gate. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../src/Pain001.Sdk/Pain001.Sdk.csproj" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared/Example.cs" Link="Shared/Example.cs" />
+  </ItemGroup>
+</Project>

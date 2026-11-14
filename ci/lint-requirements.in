@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# Python tools for the lint jobs: codespell and reuse (docs-lint),
+# pygments (scripts/halstead.py). Regenerate lint-requirements.txt with:
+#   uv pip compile --generate-hashes --python-version 3.12 ci/lint-requirements.in -o ci/lint-requirements.txt
+codespell==2.4.1
+reuse[charset-normalizer]==6.3.0
+pygments==2.21.0

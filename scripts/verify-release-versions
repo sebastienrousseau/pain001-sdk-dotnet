@@ -1,0 +1,78 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# Fails when any file that states the package version disagrees with
+# <Version> in src/Pain001.Sdk/Pain001.Sdk.csproj, the one source of
+# truth. CI runs it on every pull request; `make verify-versions` runs it
+# locally.
+#
+#   scripts/verify-release-versions            # check the working tree
+#   scripts/verify-release-versions 0.0.88     # also require this version
+#
+# Checked: CITATION.cff, the SECURITY.md and SUPPORT.md support tables,
+# every `Pain001.Sdk" Version="..."` and `dotnet add package Pain001.Sdk
+# --version ...` snippet in Markdown, the bug report form placeholder,
+# and the CHANGELOG (an `## [Unreleased]` or `## [<version>]` heading).
+set -eu
+
+cd "$(dirname "$0")/.."
+
+fail=0
+err() {
+  printf 'verify-release-versions: %s\n' "$*" >&2
+  fail=1
+}
+
+version=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Pain001.Sdk/Pain001.Sdk.csproj)
+if [ -z "$version" ]; then
+  echo "verify-release-versions: no <Version> in src/Pain001.Sdk/Pain001.Sdk.csproj" >&2
+  exit 1
+fi
+
+if [ "$#" -gt 0 ] && [ "$1" != "$version" ]; then
+  err "the csproj says $version, expected $1"
+fi
+
+# expect FILE PATTERN WHAT: FILE must contain a line matching PATTERN.
+expect() {
+  if [ ! -f "$1" ]; then
+    err "$1 is missing"
+  elif ! grep -Eq -- "$2" "$1"; then
+    err "$1: $3 is not $version"
+  fi
+}
+
+v=$(printf '%s' "$version" | sed 's/\./\\./g')
+expect CITATION.cff "^version: \"$v\"$" "version"
+expect SECURITY.md "^\| \`$v\` \|" "a support-table row"
+expect SUPPORT.md "^\| \`$v\` \|" "a support-table row"
+expect .github/ISSUE_TEMPLATE/bug_report.yml "placeholder: \"$v\"" "the SDK version placeholder"
+if ! grep -Eq "^## \[(Unreleased|$v)\]" CHANGELOG.md; then
+  err "CHANGELOG.md has neither ## [Unreleased] nor ## [$version]"
+fi
+
+# The first table row is the newest version: it must be this one.
+for f in SECURITY.md SUPPORT.md; do
+  [ -f "$f" ] || continue
+  first=$(grep -Eo "^\| \`[0-9]+\.[0-9]+\.[0-9]+\` \|" "$f" | head -n 1 | tr -d '|` ')
+  if [ -n "$first" ] && [ "$first" != "$version" ]; then
+    err "$f: the newest support-table row is $first, not $version"
+  fi
+done
+
+# Every install snippet in Markdown names this version.
+snippets=$(git ls-files '*.md' | xargs grep -HnoE \
+  'Include="Pain001\.Sdk" Version="[^"]*"|dotnet add package Pain001\.Sdk --version [^ `]*' || true)
+if [ -z "$snippets" ]; then
+  err "no Pain001.Sdk install snippet found in any Markdown file"
+fi
+stale=$(printf '%s\n' "$snippets" | grep -v -e "Version=\"$v\"" -e "--version $v\$" || true)
+if [ -n "$stale" ]; then
+  err "install snippets with another version:"
+  printf '%s\n' "$stale" >&2
+fi
+
+if [ "$fail" -ne 0 ]; then
+  exit 1
+fi
+echo "verify-release-versions: every version reference says $version"

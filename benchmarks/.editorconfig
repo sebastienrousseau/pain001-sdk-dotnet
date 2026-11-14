@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+# Benchmark-project scoping of library analyser rules that conflict with
+# BenchmarkDotNet's conventions. Each line says why.
+
+[*.cs]
+# BenchmarkDotNet discovers only public benchmark classes; CA1515 asks to make them internal.
+dotnet_diagnostic.CA1515.severity = none
+# Benchmark methods are instance methods by design.
+dotnet_diagnostic.CA1822.severity = none
+# Benchmarks measure the await the caller writes; ConfigureAwait adds nothing here.
+dotnet_diagnostic.CA2007.severity = none

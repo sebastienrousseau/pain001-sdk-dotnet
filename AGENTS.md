@@ -37,7 +37,8 @@ done.
   `Directory.Packages.props`.
 - Never log or put a request body in an exception message: it holds
   payment data.
-- No retries by default.
+- No retries by default, and never a retried `POST`: `RetryPolicy` is
+  opt-in and covers `GET` calls only.
 - Every source file opens with the SPDX header `Apache-2.0 OR MIT`.
 - Synthetic data only: no real account numbers or personal data.
 

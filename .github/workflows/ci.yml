@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Format, build (analysers and CA1502 complexity, warnings as errors),
-# unit tests on three operating systems, the vulnerable-package audit,
-# and the conformance kit against a real `pain001 serve`.
+# Format; build (warnings as errors, .NET analysers, complexity
+# ceilings) and unit tests with the 100 % coverage gate on three
+# operating systems, plus the ApiCompat pack; the vulnerable-package
+# audit; the Halstead check; the version check; and the conformance
+# kit, every example and a benchmark smoke run against a real
+# `pain001 serve`. DEVELOPMENT.md maps each job to a local command.
 name: CI
 
 on:
@@ -13,6 +16,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   DOTNET_NOLOGO: "true"
@@ -48,6 +55,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # tags, for the ApiCompat baseline
 
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
@@ -56,12 +64,12 @@ jobs:
       - name: Build (Release, warnings as errors)
         run: dotnet build Pain001.Sdk.sln -c Release
 
-      - name: Unit tests (server tests skip without PAIN001_BASE_URL)
-        run: dotnet test Pain001.Sdk.sln -c Release --no-build
+      - name: Unit tests, 100% line and branch coverage (server tests skip without PAIN001_BASE_URL)
+        run: dotnet test tests/Pain001.Sdk.Tests -c Release --no-build -p:CollectCoverage=true
 
-      - name: Pack (checked, never published)
+      - name: Pack with API compatibility (ApiCompat) against the last release
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack src/Pain001.Sdk/Pain001.Sdk.csproj -c Release --no-build -o artifacts
+        run: scripts/api-compat.sh
 
   audit:
     name: Vulnerable packages
@@ -86,6 +94,37 @@ jobs:
             exit 1
           fi
 
+  complexity:
+    name: Complexity (Halstead difficulty; the build enforces the rest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: scripts/halstead.py (ceiling 30)
+        run: |
+          python -m venv "$RUNNER_TEMP/lint"
+          "$RUNNER_TEMP/lint/bin/pip" install --require-hashes --no-deps -r ci/lint-requirements.txt
+          "$RUNNER_TEMP/lint/bin/python" scripts/halstead.py
+
+  versions:
+    name: Release versions agree
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: scripts/verify-release-versions
+        run: scripts/verify-release-versions
+
   conformance:
     name: Conformance kit against pain001 serve
     runs-on: ubuntu-latest
@@ -108,20 +147,28 @@ jobs:
           python -m venv "$RUNNER_TEMP/srv"
           "$RUNNER_TEMP/srv/bin/pip" install --require-hashes --no-deps -r ci/server-requirements.txt
 
-      - name: Start pain001 serve
+      - name: Start pain001 serve, and a second one with an API key
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP"
           nohup "$RUNNER_TEMP/srv/bin/pain001" serve --host 127.0.0.1 --port 8000 > "$RUNNER_TEMP/server.log" 2>&1 &
-          for _ in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:8000/api/v1/health > /dev/null; then
-              echo "server is up"
-              exit 0
+          PAIN001_API_KEY=ci-example-key nohup "$RUNNER_TEMP/srv/bin/pain001" serve --host 127.0.0.1 --port 8001 \
+            > "$RUNNER_TEMP/keyed.log" 2>&1 &
+          for port in 8000 8001; do
+            up=0
+            for _ in $(seq 1 60); do
+              if curl -fsS "http://127.0.0.1:$port/api/v1/health" > /dev/null; then
+                up=1
+                break
+              fi
+              sleep 1
+            done
+            if [ "$up" -ne 1 ]; then
+              cat "$RUNNER_TEMP/server.log" "$RUNNER_TEMP/keyed.log"
+              exit 1
             fi
-            sleep 1
           done
-          cat "$RUNNER_TEMP/server.log"
-          exit 1
+          echo "servers are up"
 
       - name: Build
         run: dotnet build Pain001.Sdk.sln -c Release
@@ -131,15 +178,18 @@ jobs:
           PAIN001_BASE_URL: http://127.0.0.1:8000
         run: dotnet test Pain001.Sdk.sln -c Release --no-build --logger "console;verbosity=normal"
 
-      - name: Example generates the credit transfer
+      - name: Every example against the server
         env:
           PAIN001_BASE_URL: http://127.0.0.1:8000
-        run: |
-          set -euo pipefail
-          dotnet run --project examples/Basic -c Release --no-build -- \
-            conformance/fixtures/credit-transfer.pain.001.001.09.csv "$RUNNER_TEMP/out.xml"
-          grep -q '<NbOfTxs>5</NbOfTxs>' "$RUNNER_TEMP/out.xml"
+          PAIN001_KEYED_BASE_URL: http://127.0.0.1:8001
+          PAIN001_KEYED_API_KEY: ci-example-key
+        run: scripts/run-examples.sh
 
-      - name: Server log
+      - name: Benchmark smoke run (one iteration each, not asserted)
+        env:
+          PAIN001_BASE_URL: http://127.0.0.1:8000
+        run: make bench-smoke
+
+      - name: Server logs
         if: always()
-        run: cat "$RUNNER_TEMP/server.log" || true
+        run: cat "$RUNNER_TEMP/server.log" "$RUNNER_TEMP/keyed.log" || true

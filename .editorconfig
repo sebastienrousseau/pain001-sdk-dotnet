@@ -28,3 +28,14 @@ csharp_style_namespace_declarations = file_scoped:suggestion
 # CodeMetricsConfig.txt). CA1502 is off by default; this turns it on as a
 # warning, which TreatWarningsAsErrors makes a build failure.
 dotnet_diagnostic.CA1502.severity = warning
+
+# The other complexity ceilings (cognitive complexity 15, 60 lines per
+# method, 500 per file) come from SonarAnalyzer, thresholds in
+# SonarLint.xml. SonarAnalyzer's other rules carry no per-rule setting
+# and are switched off by the default below; the .NET analysers keep the
+# per-rule severities AnalysisLevel latest-recommended gives them, which
+# take precedence (checked: CA2007 and CA1502 still fail the build).
+dotnet_analyzer_diagnostic.severity = none
+dotnet_diagnostic.S3776.severity = warning
+dotnet_diagnostic.S138.severity = warning
+dotnet_diagnostic.S104.severity = warning

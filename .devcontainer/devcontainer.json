@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+//
+// A container that boots to a working `make check`: the .NET 10 SDK,
+// Python 3.12 for the pain001 server and the docs tools, and Node for
+// markdownlint. The image is pinned by digest. postCreateCommand
+// restores the locked packages and builds the solution once.
+{
+  "name": "pain001-sdk-dotnet",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0-noble@sha256:86b40dd4bb6d4b58e9cee1f997203ca084e8447aa5a29df50c70c7bf9f1ffcc9",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" },
+    "ghcr.io/devcontainers/features/node:1": { "version": "22" }
+  },
+  "containerEnv": {
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+    "DOTNET_NOLOGO": "1"
+  },
+  "postCreateCommand": "dotnet restore Pain001.Sdk.sln --locked-mode && dotnet build Pain001.Sdk.sln -c Release --no-restore",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-dotnettools.csdevkit", "editorconfig.editorconfig"]
+    }
+  }
+}

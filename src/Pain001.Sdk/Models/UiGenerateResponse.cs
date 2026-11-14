@@ -6,6 +6,12 @@ using System.Text.Json.Serialization;
 namespace Pain001.Sdk;
 
 /// <summary>The answer to <c>POST /api/v1/ui/generate</c>.</summary>
+/// <remarks>
+/// <see cref="Pain001Client.GenerateAsync"/> returns it only with
+/// <see cref="Success"/> true and <see cref="Xml"/> set. The same shape,
+/// with the findings, is
+/// <see cref="Pain001GenerationRefusedException.Response"/> on a refusal.
+/// </remarks>
 /// <param name="Success">Whether the XML was generated.</param>
 /// <param name="Message">The result message.</param>
 /// <param name="Filename">A suggested name for the XML file.</param>

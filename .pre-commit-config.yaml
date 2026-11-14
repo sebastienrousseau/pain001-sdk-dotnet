@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# Local hooks mirroring the cheap CI gates. Install once with
+# `pre-commit install`; CI remains the authority. dotnet format and the
+# version check run from the repository's own toolchain, so they cannot
+# drift from what CI runs. conformance/ is vendored byte for byte and
+# pinned by its SHA256SUMS, so no hook may rewrite it.
+# Lock files and recorded server answers are written by tools, byte for
+# byte; no hook may rewrite them either.
+exclude: ^conformance/|packages\.lock\.json$|^benchmarks/Pain001\.Sdk\.Benchmarks/responses/
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.md$
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+        exclude: ^\.devcontainer/devcontainer\.json$
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: detect-private-key
+
+  # Same version and .codespellrc as the docs-lint job.
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v6.3.0
+    hooks:
+      - id: reuse
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.3
+    hooks:
+      - id: markdownlint-cli2
+        language_version: system # the Node.js on PATH (22, as CI)
+
+  - repo: local
+    hooks:
+      - id: dotnet-format
+        name: dotnet format --verify-no-changes
+        entry: dotnet format Pain001.Sdk.sln --verify-no-changes
+        language: system
+        pass_filenames: false
+        types: [c#]
+      - id: verify-release-versions
+        name: scripts/verify-release-versions
+        entry: scripts/verify-release-versions
+        language: system
+        pass_filenames: false
