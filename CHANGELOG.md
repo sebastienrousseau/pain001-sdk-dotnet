@@ -46,6 +46,16 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- A release workflow (`.github/workflows/release.yml`): on a signed tag
+  `v<version>` it checks the tag against `KEYS.asc` and every version
+  reference, builds and tests, packs, writes a CycloneDX SBOM and
+  `SHA256SUMS`, attests build provenance, creates the GitHub release
+  titled `pain001-sdk-dotnet <version>` with notes in the suite's shape
+  (`scripts/release-notes.sh`, highlights from
+  `.github/release-highlights.md`), checks it, and publishes to NuGet by
+  trusted publishing. Run by hand it is a dry run that skips the last
+  three steps; every step is safe to re-run.
+
 - REUSE compliance: `LICENSES/` holds the Apache-2.0 and MIT texts (as
   in `LICENSE-APACHE` and `LICENSE-MIT`), and `REUSE.toml` covers the
   files that cannot carry a header. The docs-lint workflow (and `make

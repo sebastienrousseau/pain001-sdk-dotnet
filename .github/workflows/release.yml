@@ -1,0 +1,246 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# Release: on a signed tag v<version>, build and test, pack, write a
+# CycloneDX SBOM and SHA256SUMS, attest build provenance, write the
+# GitHub release to the suite's release shape and publish to NuGet by
+# trusted publishing (OIDC).
+#
+# Dry run: run it by hand (workflow_dispatch) with dry-run on, the
+# default. It builds, packs, writes the SBOM, checksums and notes and
+# uploads them as a workflow artifact, and skips attestation, the GitHub
+# release and NuGet.
+#
+# Safe to re-run: the GitHub release is created or, when it exists,
+# edited with its assets replaced; `dotnet nuget push --skip-duplicate`
+# leaves an already published version alone.
+#
+# The settings and secrets it needs are listed in DEVELOPMENT.md.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build, without the v (for example 0.0.88)"
+        required: true
+      dry-run:
+        description: "Build and check only: no attestation, GitHub release or NuGet publish"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}-${{ inputs.version }}
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+  PROJECT: pain001-sdk-dotnet
+
+jobs:
+  build:
+    name: Build, test, pack, SBOM and checksums
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      dry-run: ${{ steps.version.outputs.dry-run }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve the version
+        id: version
+        env:
+          EVENT: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_DRY_RUN: ${{ inputs.dry-run }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = push ]; then
+            version="${REF_NAME#v}"
+            dry=false
+          else
+            version="$INPUT_VERSION"
+            dry="$INPUT_DRY_RUN"
+          fi
+          if ! printf '%s' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::not a version: $version"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "dry-run=$dry" >> "$GITHUB_OUTPUT"
+
+      - name: Every version reference says this version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: scripts/verify-release-versions "$VERSION"
+
+      - name: The tag is annotated, signed by a key in KEYS.asc, and named for the project
+        if: steps.version.outputs.dry-run != 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          tag="v$VERSION"
+          test "$(git cat-file -t "$tag")" = tag
+          subject="$(git for-each-ref --format='%(contents:subject)' "refs/tags/$tag")"
+          if [ "$subject" != "$PROJECT v$VERSION" ]; then
+            echo "::error::tag message is '$subject', expected '$PROJECT v$VERSION'"
+            exit 1
+          fi
+          git -c gpg.format=ssh -c gpg.ssh.allowedSignersFile=KEYS.asc verify-tag "$tag"
+
+      - name: Build and test (100% line and branch coverage)
+        run: |
+          set -euo pipefail
+          dotnet restore Pain001.Sdk.sln --locked-mode
+          dotnet build Pain001.Sdk.sln -c Release --no-restore
+          dotnet test tests/Pain001.Sdk.Tests -c Release --no-build -p:CollectCoverage=true
+
+      - name: Pack
+        run: dotnet pack src/Pain001.Sdk/Pain001.Sdk.csproj -c Release --no-build -o dist
+
+      - name: CycloneDX SBOM
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          dotnet tool restore
+          dotnet CycloneDX src/Pain001.Sdk/Pain001.Sdk.csproj --output dist \
+            --filename "Pain001.Sdk.$VERSION.cdx.json" --output-format Json \
+            --set-name Pain001.Sdk --set-version "$VERSION" --set-type Library
+
+      - name: SHA256SUMS and release notes
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum -- * > SHA256SUMS && cat SHA256SUMS)
+          scripts/release-notes.sh "$VERSION" dist > release-notes.md
+          cat release-notes.md
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release
+          path: |
+            dist/
+            release-notes.md
+          if-no-files-found: error
+          retention-days: 14
+
+  attest:
+    name: Attest build provenance
+    needs: build
+    if: needs.build.outputs.dry-run != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write # sign the attestation (Sigstore)
+      attestations: write # store it on the repository
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release
+
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: "dist/*.nupkg"
+
+  github-release:
+    name: GitHub release
+    needs: [build, attest]
+    if: needs.build.outputs.dry-run != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release
+    permissions:
+      contents: write # create the release and upload its assets
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release
+
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          set -euo pipefail
+          tag="v$VERSION"
+          title="$PROJECT $VERSION"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release edit "$tag" --title "$title" --notes-file release-notes.md
+            gh release upload "$tag" dist/* --clobber
+          else
+            gh release create "$tag" dist/* --verify-tag --title "$title" --notes-file release-notes.md
+          fi
+
+      - name: The live release matches the invariant
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          set -euo pipefail
+          gh release view "v$VERSION" --json name,body > live.json
+          name="$(jq -r .name live.json)"
+          if [ "$name" != "$PROJECT $VERSION" ]; then
+            echo "::error::release title is '$name'"
+            exit 1
+          fi
+          for section in "## Highlights ⭐️" "## What's Changed" "## Checksums" "**Full Changelog**"; do
+            jq -r .body live.json | grep -qF "$section" || { echo "::error::missing $section"; exit 1; }
+          done
+          if jq -r .body live.json | grep -q '—'; then
+            echo "::error::the release notes contain an em dash"
+            exit 1
+          fi
+
+  nuget:
+    name: Publish to NuGet (trusted publishing)
+    needs: [build, github-release]
+    if: needs.build.outputs.dry-run != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: release
+    permissions:
+      contents: read
+      id-token: write # exchange the OIDC token for a short-lived NuGet key
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: NuGet login (OIDC)
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push the package and its symbols
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "dist/*.nupkg" --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json --skip-duplicate
