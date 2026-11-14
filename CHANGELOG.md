@@ -46,6 +46,10 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- `.devcontainer/` (the .NET 10 dev container image pinned by digest,
+  with Python and Node) that restores and builds on creation, and a
+  `.pre-commit-config.yaml` mirroring the cheap CI gates.
+
 - A release workflow (`.github/workflows/release.yml`): on a signed tag
   `v<version>` it checks the tag against `KEYS.asc` and every version
   reference, builds and tests, packs, writes a CycloneDX SBOM and
