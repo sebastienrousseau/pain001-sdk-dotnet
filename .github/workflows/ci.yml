@@ -56,8 +56,8 @@ jobs:
       - name: Build (Release, warnings as errors)
         run: dotnet build Pain001.Sdk.sln -c Release
 
-      - name: Unit tests (server tests skip without PAIN001_BASE_URL)
-        run: dotnet test Pain001.Sdk.sln -c Release --no-build
+      - name: Unit tests, 100% line and branch coverage (server tests skip without PAIN001_BASE_URL)
+        run: dotnet test tests/Pain001.Sdk.Tests -c Release --no-build -p:CollectCoverage=true
 
       - name: Pack (checked, never published)
         if: matrix.os == 'ubuntu-latest'

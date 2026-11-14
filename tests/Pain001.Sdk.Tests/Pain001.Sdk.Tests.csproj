@@ -6,7 +6,25 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+  <!-- `dotnet test -p:CollectCoverage=true` (make coverage, and CI)
+       measures the library with coverlet and fails below 100 % line and
+       branch coverage. An exclusion is an inline
+       [ExcludeFromCodeCoverage(Justification = "...")], listed in
+       DEVELOPMENT.md; there is none today. -->
+  <PropertyGroup Condition="'$(CollectCoverage)' == 'true'">
+    <Include>[Pain001.Sdk]*</Include>
+    <Threshold>100</Threshold>
+    <ThresholdType>line,branch</ThresholdType>
+    <ThresholdStat>total</ThresholdStat>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <CoverletOutput>$(MSBuildThisFileDirectory)../../artifacts/coverage/</CoverletOutput>
+  </PropertyGroup>
+
   <ItemGroup>
+    <PackageReference Include="coverlet.msbuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="FsCheck" />
     <PackageReference Include="FsCheck.Xunit" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

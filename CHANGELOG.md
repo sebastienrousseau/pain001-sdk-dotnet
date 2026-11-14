@@ -37,6 +37,11 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- A coverage gate: `make coverage` (part of `make check`) and the CI
+  unit-test job run the tests under coverlet (`coverlet.msbuild`
+  10.1.0, test-only) and fail below 100 % line and branch coverage of
+  the library. Lock file updated.
+
 - `RetryPolicy`, an opt-in retry policy set on
   `Pain001ClientOptions.Retry` (default none, so behaviour is
   unchanged). It resends `GET` calls only (`HealthAsync`, `FacesAsync`,

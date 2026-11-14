@@ -119,7 +119,10 @@ public sealed class ClientTests
 
         ValidationError item = Assert.Single(items);
         Assert.Equal("enum", item.ErrorType);
+        Assert.Equal("bad", item.Message);
         Assert.Equal("message_type", item.Location[1].GetString());
+        Assert.Equal("pain.999", item.Input!.Value.GetString());
+        Assert.Null(item.Context);
     }
 
     [Fact]
@@ -233,6 +236,18 @@ public sealed class ClientTests
     }
 
     [Fact]
+    public void TheApiExceptionHasTheStandardConstructors()
+    {
+        var plain = new Pain001ApiException();
+        Assert.Equal("The pain001 API returned an error.", plain.Message);
+        Assert.Equal(0, plain.StatusCode);
+        Assert.Equal(JsonValueKind.Undefined, plain.Detail.ValueKind);
+        Assert.Equal("m", new Pain001ApiException("m").Message);
+        var inner = new InvalidOperationException("cause");
+        Assert.Same(inner, new Pain001ApiException("m", inner).InnerException);
+    }
+
+    [Fact]
     public void TheRefusalHasTheStandardConstructors()
     {
         Assert.Equal("The pain001 API refused to generate the XML.", new Pain001GenerationRefusedException().Message);
@@ -337,9 +352,17 @@ public sealed class ClientTests
         FaceResponse result = await client.ProjectFaceAsync("uk open/banking", "<x/>", bindings: bindings);
 
         Assert.Equal("uk_open_banking", result.Face);
+        Assert.Equal("pain.001.001.09", result.Version);
         Assert.Equal(JsonValueKind.Object, result.Payload.ValueKind);
-        Assert.Equal(0.25, result.LossReport.LossRatio);
-        Assert.Equal("d", Assert.Single(result.LossReport.UnmappedPaths));
+        LossReport loss = result.LossReport;
+        Assert.Equal("uk_open_banking", loss.Face);
+        Assert.Equal(4, loss.TotalSourceElements);
+        Assert.Equal(3, loss.MappedCount);
+        Assert.Equal(1, loss.UnmappedCount);
+        Assert.False(loss.IsLossless);
+        Assert.Equal(0.25, loss.LossRatio);
+        Assert.Equal(["a", "b", "c"], loss.MappedPaths);
+        Assert.Equal("d", Assert.Single(loss.UnmappedPaths));
         Assert.Equal("/api/v1/faces/uk%20open%2Fbanking", handler.Last!.Uri!.AbsolutePath);
         JsonNode sent = JsonNode.Parse(handler.Last.Body!)!;
         Assert.Equal("<x/>", sent["xml"]!.GetValue<string>());

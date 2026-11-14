@@ -1,16 +1,17 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
 # `make check` runs every local gate CI runs: format, build (analysers,
-# CA1502 complexity and warnings as errors), unit tests and the
-# vulnerable-package audit. Tests that need a server skip unless
+# CA1502 complexity and warnings as errors), unit tests with the 100 %
+# line and branch coverage gate, the vulnerable-package audit and the
+# version check. Tests that need a server skip unless
 # PAIN001_BASE_URL is set; `make conformance` insists on it.
 
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test audit verify-versions conformance example demo docs-lint
+.PHONY: check format format-fix build test coverage audit verify-versions conformance example demo docs-lint
 
-check: format build test audit verify-versions
+check: format build coverage audit verify-versions
 
 format:
 	dotnet format $(SOLUTION) --verify-no-changes
@@ -23,6 +24,11 @@ build:
 
 test: build
 	dotnet test $(SOLUTION) -c $(CONFIG) --no-build
+
+# The unit tests with coverlet: fails below 100 % line and branch
+# coverage of the library. The report is artifacts/coverage/.
+coverage: build
+	dotnet test tests/Pain001.Sdk.Tests -c $(CONFIG) --no-build -p:CollectCoverage=true
 
 # `dotnet list package --vulnerable` exits 0 even when it finds one, so
 # the output is checked.
