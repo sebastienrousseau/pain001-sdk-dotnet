@@ -334,6 +334,10 @@ public sealed class Pain001Client : IDisposable
             }
 
             await Task.Delay(wait.Value, _time, cancellationToken).ConfigureAwait(false);
+
+            // A wait that ends as the token is cancelled can complete rather
+            // than throw; the next attempt must not be sent either way.
+            cancellationToken.ThrowIfCancellationRequested();
         }
     }
 
