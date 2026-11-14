@@ -13,7 +13,9 @@ namespace Pain001.Sdk;
 /// <remarks>
 /// Every call is one HTTP request: there are no retries, and request
 /// bodies are never logged, because they hold payment data. A status
-/// outside 2xx raises <see cref="Pain001ApiException"/>, except from
+/// outside 2xx raises <see cref="Pain001ApiException"/> (a
+/// <see cref="Pain001GenerationRefusedException"/>, with the findings,
+/// when <see cref="GenerateAsync"/> is refused), except from
 /// <see cref="RequestAsync"/>, which returns it.
 /// </remarks>
 public sealed class Pain001Client : IDisposable
@@ -103,19 +105,21 @@ public sealed class Pain001Client : IDisposable
     /// <param name="scheme">Scheme rulebooks to enforce, comma-separated, or
     /// <see langword="null"/>.</param>
     /// <param name="cancellationToken">Cancels the request.</param>
-    /// <returns>The XML on success, or the blocking findings.</returns>
-    /// <exception cref="Pain001ApiException">The server answered outside 2xx.</exception>
+    /// <returns>The generated XML and its suggested file name.</returns>
+    /// <exception cref="Pain001GenerationRefusedException">The server refused
+    /// the data (HTTP 422 with <c>success: false</c>); its
+    /// <see cref="Pain001GenerationRefusedException.Response"/> holds the
+    /// findings.</exception>
+    /// <exception cref="Pain001ApiException">The server answered outside 2xx
+    /// for another reason, for example HTTP 422 for an unknown message
+    /// type.</exception>
     public Task<UiGenerateResponse> GenerateAsync(
         string content,
         string filename,
         string messageType,
         string? scheme = null,
         CancellationToken cancellationToken = default) =>
-        SendAsync<UiGenerateResponse>(
-            HttpMethod.Post,
-            "/api/v1/ui/generate",
-            FilePayload(content, filename, messageType, scheme),
-            cancellationToken);
+        GenerateCoreAsync(FilePayload(content, filename, messageType, scheme), cancellationToken);
 
     /// <summary>
     /// Runs the validation ladder on an existing pain.001 or pain.008
@@ -255,9 +259,27 @@ public sealed class Pain001Client : IDisposable
 
     private async Task<T> SendAsync<T>(HttpMethod method, string path, object? payload, CancellationToken cancellationToken)
     {
-        byte[]? json = payload is null ? null : JsonSerializer.SerializeToUtf8Bytes(payload, payload.GetType(), Wire.Options);
-        Pain001RawResponse response = await SendCoreAsync(method, path, json, cancellationToken).ConfigureAwait(false);
+        Pain001RawResponse response = await SendPayloadAsync(method, path, payload, cancellationToken).ConfigureAwait(false);
         return Wire.Decode<T>(response);
+    }
+
+    private async Task<UiGenerateResponse> GenerateCoreAsync(UiFilePayload payload, CancellationToken cancellationToken)
+    {
+        Pain001RawResponse response = await SendPayloadAsync(
+            HttpMethod.Post, "/api/v1/ui/generate", payload, cancellationToken).ConfigureAwait(false);
+        Pain001GenerationRefusedException? refusal = Wire.AsRefusal(response);
+        if (refusal is not null)
+        {
+            throw refusal;
+        }
+
+        return Wire.Decode<UiGenerateResponse>(response);
+    }
+
+    private Task<Pain001RawResponse> SendPayloadAsync(HttpMethod method, string path, object? payload, CancellationToken cancellationToken)
+    {
+        byte[]? json = payload is null ? null : JsonSerializer.SerializeToUtf8Bytes(payload, payload.GetType(), Wire.Options);
+        return SendCoreAsync(method, path, json, cancellationToken);
     }
 
     private async Task<Pain001RawResponse> SendCoreAsync(

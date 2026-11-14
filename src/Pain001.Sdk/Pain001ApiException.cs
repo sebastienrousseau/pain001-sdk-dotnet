@@ -12,9 +12,12 @@ namespace Pain001.Sdk;
 /// The message names the status only. The server's <c>detail</c> can
 /// echo the request (an IBAN, a row of the uploaded file), and payment
 /// data must not reach a log through an exception message, so it is kept
-/// in <see cref="Detail"/> for the caller to inspect.
+/// in <see cref="Detail"/> for the caller to inspect. When
+/// <see cref="Pain001Client.GenerateAsync"/> is refused for the data, the
+/// exception is a <see cref="Pain001GenerationRefusedException"/>, which
+/// also carries the findings in typed form.
 /// </remarks>
-public sealed class Pain001ApiException : Exception
+public class Pain001ApiException : Exception
 {
     /// <summary>Creates an exception with a default message.</summary>
     public Pain001ApiException()
@@ -42,9 +45,25 @@ public sealed class Pain001ApiException : Exception
     /// <param name="detail">The response's <c>detail</c> field, or the
     /// whole body when it has none.</param>
     public Pain001ApiException(int statusCode, JsonElement detail)
-        : base(string.Create(
-            CultureInfo.InvariantCulture,
-            $"The pain001 API returned HTTP {statusCode}; see Detail for the server's reason."))
+        : this(
+            string.Create(
+                CultureInfo.InvariantCulture,
+                $"The pain001 API returned HTTP {statusCode}; see Detail for the server's reason."),
+            statusCode,
+            detail)
+    {
+    }
+
+    /// <summary>
+    /// Creates an exception for an HTTP error response, with a message
+    /// for a subclass that knows more about the error.
+    /// </summary>
+    /// <param name="message">What went wrong; never the detail itself.</param>
+    /// <param name="statusCode">The HTTP status code.</param>
+    /// <param name="detail">The response's <c>detail</c> field, or the
+    /// whole body when it has none.</param>
+    protected Pain001ApiException(string message, int statusCode, JsonElement detail)
+        : base(message)
     {
         StatusCode = statusCode;
         Detail = detail;
@@ -55,8 +74,9 @@ public sealed class Pain001ApiException : Exception
 
     /// <summary>
     /// The server's <c>detail</c>: a string for most errors, an array of
-    /// validation errors for HTTP 422. <see cref="JsonValueKind.Undefined"/>
-    /// when the response had no body.
+    /// validation errors for HTTP 422, or the whole body when it has no
+    /// <c>detail</c> field (a refused generate call).
+    /// <see cref="JsonValueKind.Undefined"/> when the response had no body.
     /// </summary>
     public JsonElement Detail { get; }
 }

@@ -64,6 +64,38 @@ public sealed class TypedServerTests
     }
 
     [ServerFact]
+    public async Task GenerateRefusesABadCurrencyWithTheFindings()
+    {
+        using Pain001Client client = LiveServer.CreateClient();
+
+        var error = await Assert.ThrowsAsync<Pain001GenerationRefusedException>(() => client.GenerateAsync(
+            Kit.ReadText("fixtures/bad-currency.pain.001.001.09.csv"), "payments.csv", MessageTypes.Pain001V09));
+
+        Assert.Equal(422, error.StatusCode);
+        Assert.Null(error.Response.Xml);
+        RowError row = Assert.Single(error.Response.ValidationErrors!);
+        Assert.Equal("$.currency", row.Field);
+    }
+
+    [ServerFact]
+    public async Task GenerateRefusesAChapsPaymentWithoutAPurpose()
+    {
+        using Pain001Client client = LiveServer.CreateClient();
+
+        var error = await Assert.ThrowsAsync<Pain001GenerationRefusedException>(() => client.GenerateAsync(
+            Kit.ReadText("fixtures/chaps-no-purpose.pain.001.001.09.csv"),
+            "payments.csv",
+            MessageTypes.Pain001V09,
+            scheme: "uk-chaps"));
+
+        Assert.Equal(422, error.StatusCode);
+        Assert.Empty(error.Response.ValidationErrors!);
+        Assert.Equal(
+            "UK-CHAPS-PURP",
+            Assert.Single(error.Response.SchemeViolations!).GetProperty("rule").GetString());
+    }
+
+    [ServerFact]
     public async Task GenerateRejectsAnUnknownMessageTypeWithA422()
     {
         using Pain001Client client = LiveServer.CreateClient();

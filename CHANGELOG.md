@@ -33,6 +33,17 @@ suite; the first release will be `0.0.86`, in lockstep with it.
 
 ### Added
 
+- `Pain001GenerationRefusedException`, a `Pain001ApiException`
+  subclass that `GenerateAsync` raises when the server refuses the data
+  (HTTP 422 with `success: false`, pain001 0.0.87 and later). Its
+  `Response` holds the decoded body, with the blocking
+  `ValidationErrors` and `SchemeViolations`; its message gives the
+  status and the count of each, never the findings. A 422 for a
+  malformed request stays a plain `Pain001ApiException`. This matches
+  the Go SDK's `RefusalError` and the Java SDK's
+  `GenerationRefusedException`. `Pain001ApiException` is no longer
+  sealed, so a `catch (Pain001ApiException)` still catches a refusal.
+
 - Target `net10.0` only. .NET 8 and .NET 9 reached end of support on
   10 November 2026; .NET 10 is the supported LTS release (to November
   2028).

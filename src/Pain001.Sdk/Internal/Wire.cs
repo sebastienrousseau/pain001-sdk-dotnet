@@ -72,6 +72,34 @@ internal static class Wire
         return body;
     }
 
+    /// <summary>
+    /// The refusal a generate call answers with since pain001 0.0.87:
+    /// HTTP 422 whose body is a generate response with <c>success: false</c>.
+    /// Any other answer, including a 422 body that does not decode as a
+    /// generate response, is <see langword="null"/>.
+    /// </summary>
+    internal static Pain001GenerationRefusedException? AsRefusal(Pain001RawResponse response)
+    {
+        JsonElement body = response.Body;
+        if (response.StatusCode != 422
+            || body.ValueKind != JsonValueKind.Object
+            || !body.TryGetProperty("success", out JsonElement success)
+            || success.ValueKind != JsonValueKind.False)
+        {
+            return null;
+        }
+
+        try
+        {
+            UiGenerateResponse decoded = body.Deserialize<UiGenerateResponse>(Options)!;
+            return new Pain001GenerationRefusedException(response.StatusCode, body, decoded);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
     /// <summary>Whether a status code is in the 2xx range.</summary>
     internal static bool IsSuccess(int statusCode) => statusCode is >= 200 and <= 299;
 

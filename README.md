@@ -118,8 +118,10 @@ if (result.Success)
 
 The client posts the file's text to `POST /api/v1/ui/generate`; the
 server parses it in memory, validates every row and returns the XML
-inline. A row the server rejects raises `Pain001ApiException` with the
-HTTP status and the server's `detail`.
+inline. When the server refuses the data (a row fails validation or a
+scheme rule), `GenerateAsync` raises `Pain001GenerationRefusedException`,
+whose `Response` holds the findings; any other status outside 2xx raises
+`Pain001ApiException` with the HTTP status and the server's `detail`.
 
 ---
 
@@ -190,6 +192,8 @@ neither.
   types work before this list knows them.
 - `Pain001ApiException`: the HTTP status and the server's `detail` (a
   string, or an array of validation errors for HTTP 422).
+  `Pain001GenerationRefusedException` derives from it and carries a
+  refused generate call's findings in `Response`.
 - `RequestAsync`: the low-level call the conformance runner uses. It
   returns any status instead of throwing.
 - No retries, no logging, and no third-party runtime dependency.
