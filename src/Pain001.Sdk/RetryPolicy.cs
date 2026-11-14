@@ -89,8 +89,7 @@ public sealed class RetryPolicy
             return null;
         }
 
-        TimeSpan? asked = RetryAfter(retryAfter, now);
-        if (asked is null)
+        if (RetryAfter(retryAfter, now) is not TimeSpan asked)
         {
             return Backoff(attempt);
         }

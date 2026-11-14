@@ -116,7 +116,7 @@ internal static class Wire
             throw new JsonException("The pain001 API returned an empty body where JSON was expected.");
         }
 
-        return response.Body.Deserialize<T>(Options)
-            ?? throw new JsonException("The pain001 API returned an empty body where JSON was expected.");
+        // Only JSON null deserializes to null, and it was refused above.
+        return response.Body.Deserialize<T>(Options)!;
     }
 }
