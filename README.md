@@ -163,15 +163,15 @@ conformance kit against a live `pain001 serve` in CI. Core's CI also
 generates a Python client from the OpenAPI document, which it imports
 but does not run against the kit.
 
-| Project | Conformance kit in CI | Runtime dependencies | Call model |
+| Project | Language (minimum) | Conformance kit in CI | Types |
 | :--- | :---: | :---: | :---: |
-| pain001-sdk-go | Yes | None (standard library) | Blocking, `context.Context` |
-| pain001-sdk-java | Yes | Jackson databind | Blocking |
-| pain001-sdk-rust | Yes | ureq, serde, serde_json, thiserror | Blocking |
-| **pain001-sdk-dotnet** | **Yes** | **None** | **async/await, `CancellationToken`** |
-| pain001-sdk-cpp | Yes | libcurl, nlohmann/json | Blocking |
-| openapi-generator client (core CI artifact) | No, CI imports it only | Generator's | Blocking |
-| Raw HTTP | No | Your HTTP client | Yours |
+| pain001-sdk-go | Go 1.26 | Yes | Hand-written |
+| pain001-sdk-java | Java 17 | Yes | Hand-written |
+| pain001-sdk-rust | Rust 1.85 | Yes | Hand-written (serde) |
+| **pain001-sdk-dotnet** | **.NET 10** | **Yes** | **Hand-written** |
+| pain001-sdk-cpp | C++17 | Yes | Hand-written |
+| openapi-generator client (core CI artifact) | Python | No, CI imports it only | Generated |
+| Raw HTTP | Any | No | None |
 
 See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the evidence and complete matrix.
 
