@@ -11,6 +11,13 @@ suite; the first release will be `0.0.86`, in lockstep with it.
 
 ## [Unreleased]
 
+### Changed
+
+- Tests run on xunit.runner.visualstudio 4.0.1 (was 3.1.5) and
+  Microsoft.NET.Test.Sdk 18.12.0 (was 18.11.0); lock file updated.
+- The CI vulnerable-package job restores with `--locked-mode`, as
+  every other restore in CI already does through `RestoreLockedMode`.
+
 ### Added
 
 - Target `net10.0` only. .NET 8 and .NET 9 reached end of support on
