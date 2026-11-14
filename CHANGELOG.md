@@ -37,6 +37,14 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- The complexity ceilings of the portfolio standard, enforced on every
+  method by the build and CI: cyclomatic complexity 10 (CA1502, as
+  before), cognitive complexity 15, 60 lines per method and 500 per file
+  (SonarAnalyzer.CSharp 10.35.0.4138, a build-time analyser with only
+  S3776, S138 and S104 switched on; thresholds in `SonarLint.xml`), and
+  Halstead difficulty 30 (`scripts/halstead.py`, `make halstead`, the CI
+  Complexity job). No method is over a ceiling. Lock files updated.
+
 - One runnable example per public method in `examples/`: `Health`,
   `Validate`, `Generate`, `Check`, `Faces`, `ProjectFace`, `RawRequest`,
   `ErrorHandling` (refusal, API error and no-document, in catch order),

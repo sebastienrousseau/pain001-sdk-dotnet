@@ -20,5 +20,16 @@
   <ItemGroup>
     <!-- CA1502 reads its cyclomatic complexity threshold from here. -->
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeMetricsConfig.txt" />
+    <!-- SonarAnalyzer reads the cognitive complexity and length
+         thresholds from here; .editorconfig turns on only those rules. -->
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)SonarLint.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- A build-time analyser only: never a dependency of the package. -->
+    <PackageReference Include="SonarAnalyzer.CSharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

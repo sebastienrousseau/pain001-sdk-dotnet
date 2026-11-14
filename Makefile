@@ -1,17 +1,18 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# `make check` runs every local gate CI runs: format, build (analysers,
-# CA1502 complexity and warnings as errors), unit tests with the 100 %
-# line and branch coverage gate, the vulnerable-package audit and the
-# version check. Tests that need a server skip unless
+# `make check` runs every local gate CI runs that needs no server:
+# format, build (warnings as errors, .NET analysers, CA1502 and
+# SonarAnalyzer complexity ceilings), unit tests with the 100 % line and
+# branch coverage gate, the vulnerable-package audit, the version check
+# and the Halstead check. Tests that need a server skip unless
 # PAIN001_BASE_URL is set; `make conformance` insists on it.
 
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test coverage audit verify-versions conformance examples demo docs-lint
+.PHONY: check format format-fix build test coverage audit verify-versions conformance examples demo docs-lint halstead
 
-check: format build coverage audit verify-versions
+check: format build coverage audit verify-versions halstead
 
 format:
 	dotnet format $(SOLUTION) --verify-no-changes
@@ -59,6 +60,20 @@ demo: build
 	fi; \
 	command -v vhs > /dev/null || { echo "vhs not found: https://github.com/charmbracelet/vhs" >&2; exit 1; }; \
 	PAIN001_SERVER="$$server" vhs .github/demo.tape
+
+# Python lint tools (pygments), hash-checked from
+# ci/lint-requirements.txt, in a local virtual environment.
+LINT_VENV ?= .venv-lint
+
+$(LINT_VENV)/.installed: ci/lint-requirements.txt
+	python3 -m venv $(LINT_VENV)
+	$(LINT_VENV)/bin/pip install --quiet --require-hashes --no-deps -r ci/lint-requirements.txt
+	touch $@
+
+# Halstead difficulty of every C# method, ceiling 30. The build enforces
+# the other complexity ceilings (CA1502, SonarAnalyzer S3776/S138/S104).
+halstead: $(LINT_VENV)/.installed
+	$(LINT_VENV)/bin/python scripts/halstead.py
 
 docs-lint:
 	npx --yes markdownlint-cli2@0.23.3 "**/*.md"
