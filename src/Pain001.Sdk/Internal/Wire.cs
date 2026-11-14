@@ -3,6 +3,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 namespace Pain001.Sdk.Internal;
 
@@ -23,11 +24,24 @@ internal static class Wire
     /// <see cref="JsonValueKind.Undefined"/>; a body that is not JSON (a
     /// proxy's HTML error page) becomes a JSON string holding its text.
     /// </summary>
+    /// <remarks>
+    /// JSON text is UTF-8 (RFC 8259, section 8.1), but
+    /// <see cref="JsonDocument.Parse(ReadOnlyMemory{byte}, JsonDocumentOptions)"/>
+    /// accepts invalid UTF-8 inside a string and the element it returns
+    /// throws <see cref="InvalidOperationException"/> when read. Such a
+    /// body is not JSON, so it is kept as text, with each invalid byte
+    /// replaced by U+FFFD.
+    /// </remarks>
     internal static JsonElement ParseBody(byte[] bytes)
     {
         if (bytes.Length == 0)
         {
             return default;
+        }
+
+        if (!Utf8.IsValid(bytes))
+        {
+            return AsText(bytes);
         }
 
         try
@@ -37,9 +51,12 @@ internal static class Wire
         }
         catch (JsonException)
         {
-            return JsonSerializer.SerializeToElement(Encoding.UTF8.GetString(bytes));
+            return AsText(bytes);
         }
     }
+
+    private static JsonElement AsText(byte[] bytes) =>
+        JsonSerializer.SerializeToElement(Encoding.UTF8.GetString(bytes));
 
     /// <summary>
     /// The error detail: the body's <c>detail</c> field when it has one,

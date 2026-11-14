@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -263,6 +264,35 @@ public sealed class ClientTests
 
         Assert.Equal(502, error.StatusCode);
         Assert.Equal("<html>bad gateway</html>", error.Detail.GetString());
+    }
+
+    [Fact]
+    public async Task AnErrorBodyThatIsNotUtf8IsKeptAsReadableText()
+    {
+        // A Latin-1 proxy page: 0xE9 is not UTF-8, so the body is not JSON.
+        byte[] body = Encoding.Latin1.GetBytes("{\"detail\":\"caf\u00E9\"}");
+        using var handler = StubHandler.AnswerBytes(502, body, "application/json");
+        using var http = new HttpClient(handler);
+        using Pain001Client client = StubHandler.Client(http);
+
+        var error = await Assert.ThrowsAsync<Pain001ApiException>(() => client.HealthAsync());
+
+        Assert.Equal(502, error.StatusCode);
+        Assert.Equal("{\"detail\":\"caf\uFFFD\"}", error.Detail.GetString());
+    }
+
+    [Fact]
+    public async Task RequestKeepsABodyThatIsNotUtf8AsText()
+    {
+        byte[] body = [(byte)'{', (byte)'"', 0xFF, (byte)'"', (byte)':', (byte)'1', (byte)'}'];
+        using var handler = StubHandler.AnswerBytes(200, body, "application/json");
+        using var http = new HttpClient(handler);
+        using Pain001Client client = StubHandler.Client(http);
+
+        Pain001RawResponse response = await client.RequestAsync("GET", "/api/v1/health");
+
+        Assert.Equal(JsonValueKind.String, response.Body.ValueKind);
+        Assert.Equal("{\"\uFFFD\":1}", response.Body.GetString());
     }
 
     [Fact]

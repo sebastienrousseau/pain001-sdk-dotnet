@@ -47,3 +47,19 @@ suite; the first release will be `0.0.86`, in lockstep with it.
 - Community baseline: README, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT,
   AGENTS, CITATION, DCO, issue forms, a pull request template, and DCO
   and markdownlint workflows.
+- FsCheck property tests over what the server sends back
+  (`ResponsePropertyTests`): any status, bytes and media type through
+  every typed method and `RequestAsync`, error details that must stay
+  out of the exception message, and well-formed answers that must
+  decode to what was sent. 500 cases per property, in the existing unit
+  test job. Test-only packages FsCheck and FsCheck.Xunit 3.6.0; lock
+  file updated.
+
+### Fixed
+
+- A response body that is not valid UTF-8 is kept as text, each invalid
+  byte replaced by U+FFFD, as the documentation already promised for a
+  body that is not JSON. Before, `Pain001ApiException.Detail` and
+  `Pain001RawResponse.Body` held an element that threw
+  `InvalidOperationException` when read, so an error handler calling
+  `Detail.GetString()` on a Latin-1 proxy page threw again.
