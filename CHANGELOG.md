@@ -46,6 +46,17 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- The user manual: MkDocs Material from `docs/`, built in strict mode
+  by the docs workflow and deployed to GitHub Pages from `main`, with
+  the API reference rendered from the XML documentation comments
+  (`scripts/api-docs.sh`, xmldocmd). New pages: getting started,
+  examples, architecture, five ADRs, the ecosystem comparison,
+  benchmarks, packaging, policies and the roadmap; the root
+  `DEVELOPMENT.md`, `CONTRIBUTING.md`, `GOVERNANCE.md`, `SECURITY.md`,
+  `SUPPORT.md` and this changelog are included into it. `DEVELOPMENT.md`
+  maps every CI gate to its local command and lists the settings a
+  release needs. The README follows the portfolio template in full.
+
 - `make regression` (`scripts/regression.sh`): installs the pinned
   server into a temporary virtual environment unless `PAIN001_SERVER` is
   set, starts it and a second one with an API key on free loopback

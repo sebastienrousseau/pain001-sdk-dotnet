@@ -23,7 +23,7 @@ concerned.
 - **Day to day**: on the pull request. CI ([DEVELOPMENT.md](DEVELOPMENT.md))
   is the bar every change meets; review checks what CI cannot.
 - **Decisions that will be questioned later** get an Architecture
-  Decision Record in [`docs/adr/`](docs/adr/), merged with the change it
+  Decision Record in [`docs/adr/`](docs/adr/index.md), merged with the change it
   explains.
 - **The wire contract** belongs to the server. A change to what the
   server accepts or answers is decided in pain001 and reaches this SDK

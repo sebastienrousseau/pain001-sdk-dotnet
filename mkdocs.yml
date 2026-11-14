@@ -1,0 +1,89 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# The user manual: MkDocs Material from docs/. `make docs` builds it in
+# strict mode (any warning, such as a broken link, fails); the docs
+# workflow builds it on every pull request and deploys it to GitHub
+# Pages from main. docs/api/ is generated from the XML documentation
+# comments by scripts/api-docs.sh and is not committed.
+site_name: pain001-sdk-dotnet
+site_description: Typed .NET client for the pain001 REST API
+site_url: https://sebastienrousseau.github.io/pain001-sdk-dotnet/
+repo_url: https://github.com/sebastienrousseau/pain001-sdk-dotnet
+repo_name: sebastienrousseau/pain001-sdk-dotnet
+edit_uri: edit/main/docs/
+copyright: '© 2026 <a href="https://sebastienrousseau.com/" rel="author">Sebastien Rousseau</a>'
+strict: true
+
+docs_dir: docs
+site_dir: site
+exclude_docs: |
+  requirements.in
+  requirements.txt
+  hooks/
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Light mode
+
+plugins:
+  - search
+  - include-markdown
+
+hooks:
+  - docs/hooks/repo_links.py
+
+validation:
+  omitted_files: info # docs/api pages are reached from api/index.md, not the nav
+  absolute_links: info
+  unrecognized_links: warn
+  anchors: warn
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Examples: examples.md
+  - API reference: api/index.md
+  - Architecture: ARCHITECTURE.md
+  - Decisions:
+      - adr/index.md
+      - adr/0001-thin-client-over-the-server.md
+      - adr/0002-no-third-party-runtime-dependencies.md
+      - adr/0003-error-model.md
+      - adr/0004-opt-in-retries-for-get-only.md
+      - adr/0005-target-net10-only.md
+  - Comparison: COMPARISON.md
+  - Benchmarks: BENCHMARKS.md
+  - Packaging: packaging.md
+  - Policies: POLICIES.md
+  - Roadmap: ROADMAP.md
+  - Project:
+      - development.md
+      - contributing.md
+      - governance.md
+      - security.md
+      - support.md
+      - changelog.md

@@ -6,12 +6,12 @@
 # branch coverage gate, the vulnerable-package audit, the version check
 # and the Halstead check. Tests that need a server skip unless
 # PAIN001_BASE_URL is set; `make conformance` insists on it, and
-# `make regression` starts one.
+# `make regression` starts one. DEVELOPMENT.md maps every target to CI.
 
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test coverage audit verify-versions conformance examples bench bench-smoke regression demo docs-lint codespell reuse halstead
+.PHONY: check format format-fix build test coverage audit verify-versions conformance examples bench bench-smoke regression demo docs docs-lint codespell reuse halstead
 
 check: format build coverage audit verify-versions halstead
 
@@ -77,6 +77,19 @@ demo: build
 	fi; \
 	command -v vhs > /dev/null || { echo "vhs not found: https://github.com/charmbracelet/vhs" >&2; exit 1; }; \
 	PAIN001_SERVER="$$server" vhs .github/demo.tape
+
+# The manual: API reference from the XML docs, then MkDocs in strict
+# mode, into site/. The tools come from docs/requirements.txt.
+DOCS_VENV ?= .venv-docs
+
+$(DOCS_VENV)/.installed: docs/requirements.txt
+	python3 -m venv $(DOCS_VENV)
+	$(DOCS_VENV)/bin/pip install --quiet --require-hashes --no-deps -r docs/requirements.txt
+	touch $@
+
+docs: build $(DOCS_VENV)/.installed
+	CONFIG=$(CONFIG) scripts/api-docs.sh
+	$(DOCS_VENV)/bin/mkdocs build --strict
 
 # Python lint tools (codespell, reuse and pygments), hash-checked from
 # ci/lint-requirements.txt, in a local virtual environment.
