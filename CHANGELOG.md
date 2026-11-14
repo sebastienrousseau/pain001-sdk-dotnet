@@ -46,6 +46,12 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- REUSE compliance: `LICENSES/` holds the Apache-2.0 and MIT texts (as
+  in `LICENSE-APACHE` and `LICENSE-MIT`), and `REUSE.toml` covers the
+  files that cannot carry a header. The docs-lint workflow (and `make
+  docs-lint`) runs `reuse lint` and codespell beside markdownlint, from
+  hash-pinned `ci/lint-requirements.txt`.
+
 - BenchmarkDotNet benchmarks (`benchmarks/Pain001.Sdk.Benchmarks`,
   BenchmarkDotNet 0.15.8): the client-side cost of every typed method and
   `RequestAsync` with the kit's fixtures and recorded server answers, no

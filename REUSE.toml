@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+#
+# Every file is Apache-2.0 OR MIT, copyright Sebastien Rousseau. Source
+# files state the licence in their own SPDX header; this annotation adds
+# the copyright to them and covers the files that cannot carry a header:
+# generated lock files, the vendored conformance kit (byte for byte from
+# core), recorded server answers, binary media and the licence texts'
+# companions. `reuse lint` (the docs-lint workflow, `make reuse`) checks
+# that every file is covered.
+version = 1
+
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Sebastien Rousseau"
+SPDX-License-Identifier = "Apache-2.0 OR MIT"

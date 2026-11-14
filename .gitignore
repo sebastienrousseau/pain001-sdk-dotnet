@@ -17,3 +17,8 @@ examples/Basic/*.xml
 node_modules/
 .venv/
 .DS_Store
+.venv-lint/
+.venv-docs/
+site/
+docs/api/
+__pycache__/

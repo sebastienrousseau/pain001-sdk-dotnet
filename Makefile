@@ -10,7 +10,7 @@
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test coverage audit verify-versions conformance examples bench bench-smoke demo docs-lint halstead
+.PHONY: check format format-fix build test coverage audit verify-versions conformance examples bench bench-smoke demo docs-lint codespell reuse halstead
 
 check: format build coverage audit verify-versions halstead
 
@@ -72,7 +72,7 @@ demo: build
 	command -v vhs > /dev/null || { echo "vhs not found: https://github.com/charmbracelet/vhs" >&2; exit 1; }; \
 	PAIN001_SERVER="$$server" vhs .github/demo.tape
 
-# Python lint tools (pygments), hash-checked from
+# Python lint tools (codespell, reuse and pygments), hash-checked from
 # ci/lint-requirements.txt, in a local virtual environment.
 LINT_VENV ?= .venv-lint
 
@@ -86,5 +86,12 @@ $(LINT_VENV)/.installed: ci/lint-requirements.txt
 halstead: $(LINT_VENV)/.installed
 	$(LINT_VENV)/bin/python scripts/halstead.py
 
-docs-lint:
+# markdownlint, codespell and REUSE, as the docs-lint workflow runs them.
+docs-lint: codespell reuse
 	npx --yes markdownlint-cli2@0.23.3 "**/*.md"
+
+codespell: $(LINT_VENV)/.installed
+	$(LINT_VENV)/bin/codespell
+
+reuse: $(LINT_VENV)/.installed
+	$(LINT_VENV)/bin/reuse lint
