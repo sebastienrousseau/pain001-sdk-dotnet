@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This package's version follows the [`pain001`](https://github.com/sebastienrousseau/pain001)
 suite; the first release will be `0.0.88`, in lockstep with it.
 
-## [Unreleased]
+## [0.0.88] - 2026-11-14
 
 ### Changed
 
+- CI tests against pain001 0.0.88, the release this SDK ships with
+  (`ci/server-requirements.in`).
 - The CI and CodeQL workflows run in concurrency groups: a
   new push to a pull request cancels the superseded run.
 

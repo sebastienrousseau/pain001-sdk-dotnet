@@ -77,7 +77,7 @@ The SDK calls a running pain001 server, the Python package `pain001`
 with its `api` extra:
 
 ```sh
-pip install 'pain001[api]==0.0.87'
+pip install 'pain001[api]==0.0.88'
 pain001 serve --host 127.0.0.1 --port 8000
 ```
 
@@ -89,7 +89,7 @@ pain001 serve --host 127.0.0.1 --port 8000
   .NET 8 and .NET 9 reached end of support on 10 November 2026 and are
   not targeted ([policy](docs/POLICIES.md)).
 - No other package: the library depends on the base class library only.
-- A pain001 server reachable over HTTP. CI tests against pain001 0.0.87,
+- A pain001 server reachable over HTTP. CI tests against pain001 0.0.88,
   the latest released core.
 - CI builds and tests on Linux, Windows and macOS.
 
