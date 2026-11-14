@@ -13,6 +13,12 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Changed
 
+- `dotnet pack` also writes a symbols package (`.snupkg`) and runs .NET
+  package validation, which uses ApiCompat. `scripts/api-compat.sh`
+  (the CI Linux build job) adds the last published `Pain001.Sdk` as the
+  baseline, so a breaking API change fails; until the first release is
+  published it says there is no baseline and checks the package alone.
+
 - The package version is 0.0.88, the suite version this first release
   ships with (`Pain001.Sdk.csproj`, `CITATION.cff`, the `SECURITY.md`
   table, the README install snippet and the bug report form).

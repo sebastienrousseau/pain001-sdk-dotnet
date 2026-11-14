@@ -10,9 +10,14 @@
     <Deterministic>true</Deterministic>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-    <!-- Packable so `dotnet pack` can be checked, but nothing in this
-         repository publishes the package. -->
+    <!-- Packed in CI on every change; published only by
+         .github/workflows/release.yml on a signed tag. -->
     <IsPackable>true</IsPackable>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- Package validation (ApiCompat) on every pack; scripts/api-compat.sh
+         adds the last published version as the baseline. -->
+    <EnablePackageValidation>true</EnablePackageValidation>
     <PackageId>Pain001.Sdk</PackageId>
     <Version>0.0.88</Version>
     <Authors>Sebastien Rousseau</Authors>

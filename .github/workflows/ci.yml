@@ -48,6 +48,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # tags, for the ApiCompat baseline
 
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
@@ -59,9 +60,9 @@ jobs:
       - name: Unit tests, 100% line and branch coverage (server tests skip without PAIN001_BASE_URL)
         run: dotnet test tests/Pain001.Sdk.Tests -c Release --no-build -p:CollectCoverage=true
 
-      - name: Pack (checked, never published)
+      - name: Pack with API compatibility (ApiCompat) against the last release
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet pack src/Pain001.Sdk/Pain001.Sdk.csproj -c Release --no-build -o artifacts
+        run: scripts/api-compat.sh
 
   audit:
     name: Vulnerable packages
