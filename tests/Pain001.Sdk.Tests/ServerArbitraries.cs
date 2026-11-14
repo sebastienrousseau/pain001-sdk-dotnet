@@ -133,9 +133,13 @@ public static class ServerArbitraries
     {
         0 => bytes.AsMemory(0, at),
         1 when at < bytes.Length => Replace(bytes, at, value),
-        2 => (byte[])[.. bytes.AsSpan(0, at), 0xFF, .. bytes.AsSpan(at)],
-        _ => (byte[])[0xEF, 0xBB, 0xBF, .. bytes],
+        2 => InsertInvalidByte(bytes, at),
+        _ => WithByteOrderMark(bytes),
     };
+
+    private static byte[] InsertInvalidByte(byte[] bytes, int at) => [.. bytes.AsSpan(0, at), 0xFF, .. bytes.AsSpan(at)];
+
+    private static byte[] WithByteOrderMark(byte[] bytes) => [0xEF, 0xBB, 0xBF, .. bytes];
 
     private static byte[] Replace(byte[] bytes, int at, byte value)
     {
@@ -204,7 +208,7 @@ public static class ServerArbitraries
         from rule in Word()
         from severity in Gen.Elements("error", "warning")
         from message in Text()
-        from location in Gen.OneOf(Gen.Constant<string?>(null), Text().Select(t => (string?)t))
+        from location in Gen.OneOf(Gen.Constant<string?>(null), Text().Select<string, string?>(t => t))
         select new CheckFinding(rung, rule, severity, message, location);
 
     private static Gen<CheckResponse> Check() =>
