@@ -49,7 +49,7 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 - The user manual: MkDocs Material from `docs/`, built in strict mode
   by the docs workflow and deployed to GitHub Pages from `main`, with
   the API reference rendered from the XML documentation comments
-  (`scripts/api-docs.sh`, xmldocmd). New pages: getting started,
+  (`scripts/api-docs.sh`, `scripts/api_docs.py`). New pages: getting started,
   examples, architecture, five ADRs, the ecosystem comparison,
   benchmarks, packaging, policies and the roadmap; the root
   `DEVELOPMENT.md`, `CONTRIBUTING.md`, `GOVERNANCE.md`, `SECURITY.md`,

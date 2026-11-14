@@ -77,11 +77,8 @@ public sealed class RetryPolicy
         }
     }
 
-    /// <summary>
-    /// The wait before the attempt after <paramref name="attempt"/>, which
-    /// answered <paramref name="statusCode"/>, or <see langword="null"/>
-    /// to return that answer.
-    /// </summary>
+    // The wait before the attempt after `attempt`, which answered
+    // `statusCode`, or null to return that answer.
     internal TimeSpan? DelayAfter(int attempt, int statusCode, RetryConditionHeaderValue? retryAfter, DateTimeOffset now)
     {
         if (attempt >= MaxAttempts || statusCode is not (429 or 503))
@@ -97,7 +94,7 @@ public sealed class RetryPolicy
         return asked <= MaxDelay ? asked : null;
     }
 
-    /// <summary>The backoff after the failed attempt number <paramref name="attempt"/>.</summary>
+    // The backoff after the failed attempt number `attempt`.
     internal TimeSpan Backoff(int attempt)
     {
         double ceiling = Math.Min(MaxDelay.Ticks, InitialDelay.Ticks * Math.Pow(2, attempt - 1));
