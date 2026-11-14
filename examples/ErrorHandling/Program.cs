@@ -80,11 +80,15 @@ return failures;
 internal sealed class OldServerHandler : HttpMessageHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
-        Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        Task.FromResult(Refusal());
+
+    // Returned to HttpClient, which owns the response and disposes it.
+    private static HttpResponseMessage Refusal() =>
+        new(HttpStatusCode.OK)
         {
             Content = new StringContent(
                 """{"success":false,"message":"Validation failed: 1 row(s) with errors","xml":null}""",
                 Encoding.UTF8,
                 "application/json"),
-        });
+        };
 }
