@@ -11,8 +11,10 @@ namespace Pain001.Sdk;
 /// A typed client for the pain001 REST API (<c>pain001 serve</c>).
 /// </summary>
 /// <remarks>
-/// Every call is one HTTP request: there are no retries, and request
-/// bodies are never logged, because they hold payment data. A status
+/// Every call is one HTTP request unless
+/// <see cref="Pain001ClientOptions.Retry"/> is set, and then only a
+/// <c>GET</c> is retried; request bodies are never logged, because they
+/// hold payment data. A status
 /// outside 2xx raises <see cref="Pain001ApiException"/> (a
 /// <see cref="Pain001GenerationRefusedException"/>, with the findings,
 /// when <see cref="GenerateAsync"/> is refused), except from
@@ -25,6 +27,8 @@ public sealed class Pain001Client : IDisposable
     private readonly string _baseAddress;
     private readonly string? _apiKey;
     private readonly TimeSpan _timeout;
+    private readonly RetryPolicy? _retry;
+    private readonly TimeProvider _time = TimeProvider.System;
 
     /// <summary>
     /// Creates a client that sends its requests through
@@ -43,6 +47,8 @@ public sealed class Pain001Client : IDisposable
         _baseAddress = CheckBaseAddress(options.BaseAddress);
         _apiKey = options.ApiKey;
         _timeout = CheckTimeout(options.Timeout);
+        _retry = options.Retry;
+        _time = options.TimeProvider;
     }
 
     /// <summary>
@@ -297,6 +303,46 @@ public sealed class Pain001Client : IDisposable
         byte[]? json,
         CancellationToken cancellationToken)
     {
+        if (_retry is null || method != HttpMethod.Get)
+        {
+            (Pain001RawResponse once, _) = await SendOnceAsync(method, path, json, cancellationToken).ConfigureAwait(false);
+            return once;
+        }
+
+        return await SendWithRetryAsync(_retry, path, cancellationToken).ConfigureAwait(false);
+    }
+
+    // Only a GET reaches here: it has no body, and sending it again is safe.
+    private async Task<Pain001RawResponse> SendWithRetryAsync(RetryPolicy retry, string path, CancellationToken cancellationToken)
+    {
+        for (int attempt = 1; ; attempt++)
+        {
+            TimeSpan? wait;
+            try
+            {
+                (Pain001RawResponse response, RetryConditionHeaderValue? retryAfter) =
+                    await SendOnceAsync(HttpMethod.Get, path, null, cancellationToken).ConfigureAwait(false);
+                wait = retry.DelayAfter(attempt, response.StatusCode, retryAfter, _time.GetUtcNow());
+                if (wait is null)
+                {
+                    return response;
+                }
+            }
+            catch (HttpRequestException) when (attempt < retry.MaxAttempts)
+            {
+                wait = retry.Backoff(attempt);
+            }
+
+            await Task.Delay(wait.Value, _time, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private async Task<(Pain001RawResponse Response, RetryConditionHeaderValue? RetryAfter)> SendOnceAsync(
+        HttpMethod method,
+        string path,
+        byte[]? json,
+        CancellationToken cancellationToken)
+    {
         using CancellationTokenSource deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(_timeout);
         using HttpRequestMessage request = BuildRequest(method, path, json);
@@ -304,7 +350,7 @@ public sealed class Pain001Client : IDisposable
         {
             using HttpResponseMessage response = await _http.SendAsync(request, deadline.Token).ConfigureAwait(false);
             byte[] bytes = await response.Content.ReadAsByteArrayAsync(deadline.Token).ConfigureAwait(false);
-            return new Pain001RawResponse((int)response.StatusCode, Wire.ParseBody(bytes));
+            return (new Pain001RawResponse((int)response.StatusCode, Wire.ParseBody(bytes)), response.Headers.RetryAfter);
         }
         catch (OperationCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {

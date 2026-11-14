@@ -37,6 +37,16 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- `RetryPolicy`, an opt-in retry policy set on
+  `Pain001ClientOptions.Retry` (default none, so behaviour is
+  unchanged). It resends `GET` calls only (`HealthAsync`, `FacesAsync`,
+  `RequestAsync` with `GET`) on HTTP 429 or 503 and on connection
+  errors, up to `MaxAttempts` (3), with exponential backoff and jitter
+  from `InitialDelay` (200 ms) capped at `MaxDelay` (5 s). A
+  `Retry-After` header replaces the backoff, and one asking for more
+  than `MaxDelay` ends the retries. A `POST` is never retried.
+  `Pain001ClientOptions.TimeProvider` sets the clock it waits on.
+
 - `Pain001GenerationRefusedException`, a `Pain001ApiException`
   subclass that `GenerateAsync` raises when the server refuses the data
   (HTTP 422 with `success: false`, pain001 0.0.87 and later). Its

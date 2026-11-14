@@ -42,7 +42,7 @@ not parse XML, write files or run code from the server.
 | **Payment data in logs** | The SDK logs nothing. Request bodies are never written anywhere, and an API error's message names only the HTTP status: the server's `detail`, which can echo input, stays in `Pain001ApiException.Detail`. |
 | **API key** | Sent only as `Authorization: Bearer <key>` to the configured base address. Use `https` for any server that is not on loopback. |
 | **Hostile or broken server** | Responses are parsed with `System.Text.Json`; a non-JSON body becomes a string, never an exception from inside the parser. Every request has a timeout (30 seconds by default). |
-| **Retries** | None. A payment request is never sent twice by the SDK. |
+| **Retries** | Off by default. The opt-in `RetryPolicy` resends only `GET` requests (health, faces, a raw `GET`), which carry no payment data; a payment request (`POST`) is never sent twice by the SDK. |
 | **Dependencies** | No third-party runtime dependency: only the .NET base class library. Test packages are pinned exactly in `Directory.Packages.props`, and CI fails on any package `dotnet list package --vulnerable` reports. |
 
 ### Cryptography status

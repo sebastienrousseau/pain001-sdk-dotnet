@@ -198,7 +198,8 @@ neither.
   (an older or broken server), so a returned result always has it.
 - `RequestAsync`: the low-level call the conformance runner uses. It
   returns any status instead of throwing.
-- No retries, no logging, and no third-party runtime dependency.
+- `RetryPolicy`: opt-in retries for `GET` calls only, off by default.
+- No logging, and no third-party runtime dependency.
 
 ---
 
@@ -219,6 +220,8 @@ using var client = new Pain001Client(httpClient, options);
 | `BaseAddress` | `http://127.0.0.1:8000` | The server's absolute address; a path prefix is kept |
 | `ApiKey` | none | Sent as `Authorization: Bearer <key>` |
 | `Timeout` | 30 seconds | Per request; exceeding it raises `TimeoutException` |
+| `Retry` | none | A `RetryPolicy` for `GET` calls only (health, faces, a raw `GET`): `MaxAttempts` (3), `InitialDelay` (200 ms), `MaxDelay` (5 s); retries 429, 503 and connection errors with jittered exponential backoff, honouring `Retry-After`. A `POST` is never retried |
+| `TimeProvider` | `TimeProvider.System` | The clock for retry waits and `Retry-After` dates |
 
 The client never changes the settings of an `HttpClient` you pass in,
 and does not dispose it.
@@ -238,9 +241,10 @@ and does not dispose it.
 - **You cannot run the pain001 server.** This SDK does not generate or
   validate anything itself; every call goes to `pain001 serve`.
 - **You need it from NuGet today.** It is not published yet.
-- **You need retries.** The SDK never resends a payment request; add
-  your own policy (for example with `IHttpClientFactory`) if you want
-  one, knowing a retried generation is a second request.
+- **You need payment calls retried.** The opt-in `RetryPolicy` covers
+  `GET` calls only; the SDK never resends a `POST` (validate, generate,
+  check, a face projection). Add your own policy if you need one, knowing
+  a retried generation is a second request.
 
 ---
 
@@ -266,7 +270,8 @@ and the conformance kit against a hash-pinned `pain001 serve`.
 The SDK logs nothing and never puts a request body in an exception
 message, because request bodies hold payment data. It has no
 third-party runtime dependency, sends the API key only as a bearer
-token to the configured server, and never retries.
+token to the configured server, and never retries a `POST`; retries of
+`GET` calls are opt-in.
 
 Report vulnerabilities according to [`SECURITY.md`](SECURITY.md).
 
