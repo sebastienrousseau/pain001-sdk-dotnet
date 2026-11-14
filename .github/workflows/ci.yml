@@ -79,7 +79,7 @@ jobs:
       - name: dotnet list package --vulnerable
         run: |
           set -euo pipefail
-          dotnet restore Pain001.Sdk.sln
+          dotnet restore Pain001.Sdk.sln --locked-mode
           out="$(dotnet list Pain001.Sdk.sln package --vulnerable --include-transitive 2>&1)"
           echo "$out"
           if echo "$out" | grep -q "has the following vulnerable packages"; then
