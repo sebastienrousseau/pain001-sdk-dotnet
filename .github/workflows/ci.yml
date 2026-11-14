@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0 OR MIT
 #
-# Format, build (analysers and CA1502 complexity, warnings as errors),
-# unit tests on three operating systems, the vulnerable-package audit,
-# and the conformance kit against a real `pain001 serve`.
+# Format; build (warnings as errors, .NET analysers, complexity
+# ceilings) and unit tests with the 100 % coverage gate on three
+# operating systems, plus the ApiCompat pack; the vulnerable-package
+# audit; the Halstead check; the version check; and the conformance
+# kit, every example and a benchmark smoke run against a real
+# `pain001 serve`. DEVELOPMENT.md maps each job to a local command.
 name: CI
 
 on:
@@ -13,6 +16,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   DOTNET_NOLOGO: "true"

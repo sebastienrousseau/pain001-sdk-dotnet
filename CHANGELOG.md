@@ -13,6 +13,9 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Changed
 
+- The CI and CodeQL workflows run in concurrency groups: a
+  new push to a pull request cancels the superseded run.
+
 - `dotnet pack` also writes a symbols package (`.snupkg`) and runs .NET
   package validation, which uses ApiCompat. `scripts/api-compat.sh`
   (the CI Linux build job) adds the last published `Pain001.Sdk` as the
