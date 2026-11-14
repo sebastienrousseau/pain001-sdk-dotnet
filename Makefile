@@ -8,9 +8,9 @@
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test audit conformance example demo docs-lint
+.PHONY: check format format-fix build test audit verify-versions conformance example demo docs-lint
 
-check: format build test audit
+check: format build test audit verify-versions
 
 format:
 	dotnet format $(SOLUTION) --verify-no-changes
@@ -30,6 +30,10 @@ audit:
 	@out="$$(dotnet list $(SOLUTION) package --vulnerable --include-transitive 2>&1)"; \
 	echo "$$out"; \
 	if echo "$$out" | grep -q "has the following vulnerable packages"; then exit 1; fi
+
+# Every file that states the version agrees with the csproj.
+verify-versions:
+	scripts/verify-release-versions
 
 conformance: build
 	@test -n "$$PAIN001_BASE_URL" || { echo "PAIN001_BASE_URL is unset: start pain001 serve first" >&2; exit 1; }
