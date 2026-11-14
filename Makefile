@@ -5,12 +5,13 @@
 # SonarAnalyzer complexity ceilings), unit tests with the 100 % line and
 # branch coverage gate, the vulnerable-package audit, the version check
 # and the Halstead check. Tests that need a server skip unless
-# PAIN001_BASE_URL is set; `make conformance` insists on it.
+# PAIN001_BASE_URL is set; `make conformance` insists on it, and
+# `make regression` starts one.
 
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test coverage audit verify-versions conformance examples bench bench-smoke demo docs-lint codespell reuse halstead
+.PHONY: check format format-fix build test coverage audit verify-versions conformance examples bench bench-smoke regression demo docs-lint codespell reuse halstead
 
 check: format build coverage audit verify-versions halstead
 
@@ -60,6 +61,11 @@ bench: build
 # One iteration of each (BenchmarkDotNet's Dry job): kept running, not measured.
 bench-smoke: build
 	$(BENCH) --job Dry --artifacts artifacts/benchmarks-smoke
+
+# The full gate against a real server it installs and starts:
+# scripts/regression.sh.
+regression:
+	scripts/regression.sh
 
 # Renders .github/demo.gif from .github/demo.tape against a real
 # `pain001 serve` on 127.0.0.1. The server is $PAIN001_SERVER, else

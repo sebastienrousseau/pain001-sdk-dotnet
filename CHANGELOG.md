@@ -46,6 +46,12 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- `make regression` (`scripts/regression.sh`): installs the pinned
+  server into a temporary virtual environment unless `PAIN001_SERVER` is
+  set, starts it and a second one with an API key on free loopback
+  ports, runs `make check`, the conformance kit, every example and the
+  benchmark smoke run, and stops both servers on exit, failure included.
+
 - `.devcontainer/` (the .NET 10 dev container image pinned by digest,
   with Python and Node) that restores and builds on creation, and a
   `.pre-commit-config.yaml` mirroring the cheap CI gates.
