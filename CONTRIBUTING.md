@@ -31,6 +31,25 @@ VIRTUAL_ENV=/tmp/pain001-srv uv pip install 'pain001[api]==0.0.86'
 PAIN001_BASE_URL=http://127.0.0.1:8000 make conformance
 ```
 
+### The README demo
+
+`.github/demo.gif` is rendered from `.github/demo.tape` with
+[vhs](https://github.com/charmbracelet/vhs) (it needs `ttyd` and
+`ffmpeg`). `make demo` builds the solution, starts the server on
+`127.0.0.1:8765`, runs the built `examples/Basic` against the
+conformance kit's synthetic CSV and stops the server again. It takes
+the server from `PAIN001_SERVER`, or `pain001` on `PATH`, and stops
+with an error when neither is there. Install the server the way the CI
+conformance job does, hash-pinned:
+
+```sh
+uv venv /tmp/pain001-demo-srv
+VIRTUAL_ENV=/tmp/pain001-demo-srv uv pip install --require-hashes --no-deps -r ci/server-requirements.txt
+PAIN001_SERVER=/tmp/pain001-demo-srv/bin/pain001 make demo
+```
+
+Re-render it in the same change whenever the example's output changes.
+
 ## What the tests are for
 
 - `ClientTests`: the client against an in-memory `HttpMessageHandler`:

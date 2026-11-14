@@ -8,7 +8,7 @@
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test audit conformance example docs-lint
+.PHONY: check format format-fix build test audit conformance example demo docs-lint
 
 check: format build test audit
 
@@ -37,6 +37,17 @@ conformance: build
 
 example: build
 	dotnet run --project examples/Basic -c $(CONFIG) --no-build
+
+# Renders .github/demo.gif from .github/demo.tape against a real
+# `pain001 serve` on 127.0.0.1. The server is $PAIN001_SERVER, else
+# `pain001` on PATH; CONTRIBUTING.md shows how to install it.
+demo: build
+	@server="$${PAIN001_SERVER:-$$(command -v pain001 || true)}"; \
+	if [ -z "$$server" ] || [ ! -x "$$server" ]; then \
+	  echo "pain001 server not found: set PAIN001_SERVER or put pain001 on PATH (see CONTRIBUTING.md)" >&2; exit 1; \
+	fi; \
+	command -v vhs > /dev/null || { echo "vhs not found: https://github.com/charmbracelet/vhs" >&2; exit 1; }; \
+	PAIN001_SERVER="$$server" vhs .github/demo.tape
 
 docs-lint:
 	npx --yes markdownlint-cli2@0.23.3 "**/*.md"

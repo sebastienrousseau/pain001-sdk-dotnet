@@ -13,6 +13,11 @@ suite; the first release will be `0.0.86`, in lockstep with it.
 
 ### Changed
 
+- The README shows a demo, `.github/demo.gif`, rendered by `make demo`
+  from `.github/demo.tape`: the Basic example against a real
+  `pain001 serve` on loopback. `examples/Basic` now also prints the
+  server's health and the validation row counts before it generates.
+
 - Tests run on xunit.runner.visualstudio 4.0.1 (was 3.1.5) and
   Microsoft.NET.Test.Sdk 18.12.0 (was 18.11.0); lock file updated.
 - The CI vulnerable-package job restores with `--locked-mode`, as

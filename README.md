@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <!-- No .github/demo.gif yet: a recording needs a running pain001 server, and this repository has no VHS recipe for it yet. -->
+  <img src="https://raw.githubusercontent.com/sebastienrousseau/pain001-sdk-dotnet/main/.github/demo.gif" alt="The Basic example using the .NET SDK against pain001 serve on loopback: health check, validation of the conformance kit's synthetic CSV, and generation of an XSD-valid pain.001.001.09 file" width="100%" />
 </p>
 
 ---
@@ -223,7 +223,7 @@ and does not dispose it.
 
 | Example | What it does | Run it |
 | :--- | :--- | :--- |
-| [`examples/Basic`](examples/Basic/Program.cs) | Generates a pain.001.001.09 file from the kit's synthetic credit-transfer CSV | `PAIN001_BASE_URL=http://127.0.0.1:8000 dotnet run --project examples/Basic` |
+| [`examples/Basic`](examples/Basic/Program.cs) | Checks the server's health, validates the kit's synthetic credit-transfer CSV and generates a pain.001.001.09 file from it | `PAIN001_BASE_URL=http://127.0.0.1:8000 dotnet run --project examples/Basic` |
 
 ---
 
