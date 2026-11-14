@@ -120,20 +120,28 @@ jobs:
           python -m venv "$RUNNER_TEMP/srv"
           "$RUNNER_TEMP/srv/bin/pip" install --require-hashes --no-deps -r ci/server-requirements.txt
 
-      - name: Start pain001 serve
+      - name: Start pain001 serve, and a second one with an API key
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP"
           nohup "$RUNNER_TEMP/srv/bin/pain001" serve --host 127.0.0.1 --port 8000 > "$RUNNER_TEMP/server.log" 2>&1 &
-          for _ in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:8000/api/v1/health > /dev/null; then
-              echo "server is up"
-              exit 0
+          PAIN001_API_KEY=ci-example-key nohup "$RUNNER_TEMP/srv/bin/pain001" serve --host 127.0.0.1 --port 8001 \
+            > "$RUNNER_TEMP/keyed.log" 2>&1 &
+          for port in 8000 8001; do
+            up=0
+            for _ in $(seq 1 60); do
+              if curl -fsS "http://127.0.0.1:$port/api/v1/health" > /dev/null; then
+                up=1
+                break
+              fi
+              sleep 1
+            done
+            if [ "$up" -ne 1 ]; then
+              cat "$RUNNER_TEMP/server.log" "$RUNNER_TEMP/keyed.log"
+              exit 1
             fi
-            sleep 1
           done
-          cat "$RUNNER_TEMP/server.log"
-          exit 1
+          echo "servers are up"
 
       - name: Build
         run: dotnet build Pain001.Sdk.sln -c Release
@@ -143,15 +151,13 @@ jobs:
           PAIN001_BASE_URL: http://127.0.0.1:8000
         run: dotnet test Pain001.Sdk.sln -c Release --no-build --logger "console;verbosity=normal"
 
-      - name: Example generates the credit transfer
+      - name: Every example against the server
         env:
           PAIN001_BASE_URL: http://127.0.0.1:8000
-        run: |
-          set -euo pipefail
-          dotnet run --project examples/Basic -c Release --no-build -- \
-            conformance/fixtures/credit-transfer.pain.001.001.09.csv "$RUNNER_TEMP/out.xml"
-          grep -q '<NbOfTxs>5</NbOfTxs>' "$RUNNER_TEMP/out.xml"
+          PAIN001_KEYED_BASE_URL: http://127.0.0.1:8001
+          PAIN001_KEYED_API_KEY: ci-example-key
+        run: scripts/run-examples.sh
 
-      - name: Server log
+      - name: Server logs
         if: always()
-        run: cat "$RUNNER_TEMP/server.log" || true
+        run: cat "$RUNNER_TEMP/server.log" "$RUNNER_TEMP/keyed.log" || true

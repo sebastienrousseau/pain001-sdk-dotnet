@@ -37,6 +37,15 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ### Added
 
+- One runnable example per public method in `examples/`: `Health`,
+  `Validate`, `Generate`, `Check`, `Faces`, `ProjectFace`, `RawRequest`,
+  `ErrorHandling` (refusal, API error and no-document, in catch order),
+  `Timeouts` (timeout, cancellation and `RetryPolicy`) and `ApiKey`,
+  beside `Basic`. Each checks its own result. `scripts/run-examples.sh`
+  (`make examples`) runs them all; the CI conformance job runs it
+  against `pain001 serve`, plus `ApiKey` against a second server
+  started with `PAIN001_API_KEY`.
+
 - A coverage gate: `make coverage` (part of `make check`) and the CI
   unit-test job run the tests under coverlet (`coverlet.msbuild`
   10.1.0, test-only) and fail below 100 % line and branch coverage of

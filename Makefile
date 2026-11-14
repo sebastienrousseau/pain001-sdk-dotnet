@@ -9,7 +9,7 @@
 SOLUTION := Pain001.Sdk.sln
 CONFIG   := Release
 
-.PHONY: check format format-fix build test coverage audit verify-versions conformance example demo docs-lint
+.PHONY: check format format-fix build test coverage audit verify-versions conformance examples demo docs-lint
 
 check: format build coverage audit verify-versions
 
@@ -45,8 +45,9 @@ conformance: build
 	@test -n "$$PAIN001_BASE_URL" || { echo "PAIN001_BASE_URL is unset: start pain001 serve first" >&2; exit 1; }
 	dotnet test $(SOLUTION) -c $(CONFIG) --no-build
 
-example: build
-	dotnet run --project examples/Basic -c $(CONFIG) --no-build
+# Every example in examples/, against PAIN001_BASE_URL.
+examples: build
+	CONFIG=$(CONFIG) scripts/run-examples.sh
 
 # Renders .github/demo.gif from .github/demo.tape against a real
 # `pain001 serve` on 127.0.0.1. The server is $PAIN001_SERVER, else

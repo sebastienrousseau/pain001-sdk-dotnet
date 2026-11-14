@@ -230,9 +230,24 @@ and does not dispose it.
 
 ## Examples
 
-| Example | What it does | Run it |
+Each example is a console project that checks its own result. CI runs
+every one against `pain001 serve` (`scripts/run-examples.sh`); run them
+from the repository root, with `PAIN001_BASE_URL` pointing at a server
+(default `http://127.0.0.1:8000`) and, optionally, `PAIN001_API_KEY`.
+
+| Example | Shows | Run it |
 | :--- | :--- | :--- |
-| [`examples/Basic`](examples/Basic/Program.cs) | Checks the server's health, validates the kit's synthetic credit-transfer CSV and generates a pain.001.001.09 file from it | `PAIN001_BASE_URL=http://127.0.0.1:8000 dotnet run --project examples/Basic` |
+| [`Basic`](examples/Basic/Program.cs) | Health, validation and generation in one go: the README demo | `dotnet run --project examples/Basic` |
+| [`Health`](examples/Health/Program.cs) | `HealthAsync`: server status and version | `dotnet run --project examples/Health` |
+| [`Validate`](examples/Validate/Program.cs) | `ValidateAsync`: row counts, a rejected IBAN (HTTP 400), the `uk-chaps` scheme's violations | `dotnet run --project examples/Validate` |
+| [`Generate`](examples/Generate/Program.cs) | `GenerateAsync`: write the XML to a file | `dotnet run --project examples/Generate -- out.xml` |
+| [`Check`](examples/Check/Program.cs) | `CheckAsync`: the validation ladder on an existing document | `dotnet run --project examples/Check` |
+| [`Faces`](examples/Faces/Program.cs) | `FacesAsync`: the faces and their bindings | `dotnet run --project examples/Faces` |
+| [`ProjectFace`](examples/ProjectFace/Program.cs) | `ProjectFaceAsync`: a face payload and its loss report | `dotnet run --project examples/ProjectFace -- berlin_group` |
+| [`RawRequest`](examples/RawRequest/Program.cs) | `RequestAsync`: any method and path, status returned, never thrown | `dotnet run --project examples/RawRequest` |
+| [`ErrorHandling`](examples/ErrorHandling/Program.cs) | `Pain001GenerationRefusedException`, `Pain001ApiException` and `Pain001NoDocumentException`, caught in the right order | `dotnet run --project examples/ErrorHandling` |
+| [`Timeouts`](examples/Timeouts/Program.cs) | `Timeout`, a `CancellationToken` and the opt-in `RetryPolicy` | `dotnet run --project examples/Timeouts` |
+| [`ApiKey`](examples/ApiKey/Program.cs) | `ApiKey` sent as a bearer token; a wrong key refused with HTTP 401 | `PAIN001_API_KEY=... dotnet run --project examples/ApiKey` |
 
 ---
 
@@ -253,7 +268,7 @@ and does not dispose it.
 ```bash
 make check          # format, build, unit tests, vulnerable-package audit
 make conformance    # the kit and typed tests; needs PAIN001_BASE_URL
-make example        # run examples/Basic against PAIN001_BASE_URL
+make examples       # run every example against PAIN001_BASE_URL
 make docs-lint      # markdownlint, as the docs-lint workflow runs it
 ```
 
