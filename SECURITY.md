@@ -7,11 +7,11 @@
 This SDK follows the [`pain001`](https://github.com/sebastienrousseau/pain001)
 suite cadence. While pre-`1.0`, the latest released `0.0.x` receives
 security fixes; older `0.0.x` versions do not. No version has been
-released yet: the first will be `0.0.86`, in lockstep with the suite.
+released yet: the first will be `0.0.88`, in lockstep with the suite.
 
 | Version | Status | Receives security fixes? |
 | :--- | :--- | :--- |
-| `0.0.86` | Unreleased, in development | Yes, once released |
+| `0.0.88` | Unreleased, in development | Yes, once released |
 
 ## Reporting a vulnerability
 

@@ -61,7 +61,7 @@
 
 ### As a .NET library
 
-The package is **not yet on NuGet**. The first release, `0.0.86`, will
+The package is **not yet on NuGet**. The first release, `0.0.88`, will
 ship in lockstep with the pain001 suite. Until then, reference the
 project from source:
 
@@ -74,7 +74,7 @@ project from source:
 Once it is published, the reference will be:
 
 ```xml
-<PackageReference Include="Pain001.Sdk" Version="0.0.86" />
+<PackageReference Include="Pain001.Sdk" Version="0.0.88" />
 ```
 
 You also need a running pain001 server, which is the Python package

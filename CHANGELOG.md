@@ -7,11 +7,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 This package's version follows the [`pain001`](https://github.com/sebastienrousseau/pain001)
-suite; the first release will be `0.0.86`, in lockstep with it.
+suite; the first release will be `0.0.88`, in lockstep with it.
 
 ## [Unreleased]
 
 ### Changed
+
+- The package version is 0.0.88, the suite version this first release
+  ships with (`Pain001.Sdk.csproj`, `CITATION.cff`, the `SECURITY.md`
+  table, the README install snippet and the bug report form).
 
 - The vendored conformance kit is kit 2, byte-identical to core's
   (pinned by `conformance/SHA256SUMS`): new cases
@@ -59,13 +63,13 @@ suite; the first release will be `0.0.86`, in lockstep with it.
   pain001's `RowError` `{field, message, value}`; HTTP 422 items as
   FastAPI's `ValidationError`), and `MessageTypes`
   constants for the 13 message types the server lists.
-- The conformance kit, vendored from core 0.0.86 and pinned by
+- The conformance kit, vendored from core and pinned by
   `conformance/SHA256SUMS`, with a runner that ports core's reference
   runner, typed tests for every method, and unit tests against an
   in-memory handler.
 - CI: format, build and unit tests on Linux, Windows and macOS, a
   vulnerable-package audit, and a conformance job against a
-  hash-pinned `pain001 serve` 0.0.86.
+  hash-pinned `pain001 serve`.
 - An example console project, `examples/Basic`, that generates a
   pain.001.001.09 file from the kit's credit-transfer fixture.
 - Community baseline: README, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT,
