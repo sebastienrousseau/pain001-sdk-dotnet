@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+name: Bug report
+description: Report a reproducible problem in pain001-sdk-dotnet
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Issues are public. Use synthetic data only: never paste real
+        account numbers, personal data or bank-restricted material. Report
+        a vulnerability privately as SECURITY.md describes, not here.
+  - type: input
+    id: version
+    attributes:
+      label: pain001-sdk-dotnet version
+      placeholder: "0.0.86"
+    validations:
+      required: true
+  - type: dropdown
+    id: dotnet_version
+    attributes:
+      label: .NET runtime
+      options:
+        - ".NET 10"
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproducible example
+      description: The smallest input and code that show the problem, and the pain001 server version it ran against.
+      render: csharp
+    validations:
+      required: true
+  - type: textarea
+    id: error_output
+    attributes:
+      label: Error output
+      render: text

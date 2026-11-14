@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{csproj,props,targets,xml,yml,yaml,json,jsonc}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.sln]
+end_of_line = crlf
+indent_style = tab
+
+[*.cs]
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+# Cyclomatic complexity ceiling of 10 per method (threshold in
+# CodeMetricsConfig.txt). CA1502 is off by default; this turns it on as a
+# warning, which TreatWarningsAsErrors makes a build failure.
+dotnet_diagnostic.CA1502.severity = warning
