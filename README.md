@@ -194,6 +194,8 @@ neither.
   string, or an array of validation errors for HTTP 422).
   `Pain001GenerationRefusedException` derives from it and carries a
   refused generate call's findings in `Response`.
+- `Pain001NoDocumentException`: a 2xx generate answer without the XML
+  (an older or broken server), so a returned result always has it.
 - `RequestAsync`: the low-level call the conformance runner uses. It
   returns any status instead of throwing.
 - No retries, no logging, and no third-party runtime dependency.

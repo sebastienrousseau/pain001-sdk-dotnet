@@ -113,6 +113,9 @@ public sealed class Pain001Client : IDisposable
     /// <exception cref="Pain001ApiException">The server answered outside 2xx
     /// for another reason, for example HTTP 422 for an unknown message
     /// type.</exception>
+    /// <exception cref="Pain001NoDocumentException">The server answered 2xx
+    /// without the XML (a server older than pain001 0.0.87, or a broken
+    /// one).</exception>
     public Task<UiGenerateResponse> GenerateAsync(
         string content,
         string filename,
@@ -273,7 +276,13 @@ public sealed class Pain001Client : IDisposable
             throw refusal;
         }
 
-        return Wire.Decode<UiGenerateResponse>(response);
+        UiGenerateResponse result = Wire.Decode<UiGenerateResponse>(response);
+        if (!result.Success || string.IsNullOrEmpty(result.Xml))
+        {
+            throw new Pain001NoDocumentException(response.StatusCode, result);
+        }
+
+        return result;
     }
 
     private Task<Pain001RawResponse> SendPayloadAsync(HttpMethod method, string path, object? payload, CancellationToken cancellationToken)

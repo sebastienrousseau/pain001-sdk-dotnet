@@ -245,6 +245,41 @@ public sealed class ClientTests
         Assert.Equal("m", withCause.Response.Message);
     }
 
+    [Theory]
+    [InlineData("""{"success":false,"message":"Validation failed","xml":null,"validation_errors":[],"scheme_violations":[]}""")]
+    [InlineData("""{"success":true,"message":"done","xml":null}""")]
+    [InlineData("""{"success":true,"message":"done","xml":""}""")]
+    [InlineData("""{"success":true,"message":"done"}""")]
+    [InlineData("""{"success":false,"message":"odd","xml":"<Document/>"}""")]
+    public async Task ASuccessfulGenerateWithoutTheXmlRaisesNoDocument(string answer)
+    {
+        using var handler = StubHandler.Answer(HttpStatusCode.OK, answer);
+        using var http = new HttpClient(handler);
+        using Pain001Client client = StubHandler.Client(http);
+
+        var error = await Assert.ThrowsAsync<Pain001NoDocumentException>(
+            () => client.GenerateAsync("x", "p.csv", MessageTypes.Pain001V09));
+
+        Assert.Equal(200, error.StatusCode);
+        Assert.NotNull(error.Response);
+        Assert.Equal(
+            "The pain001 API answered generate with HTTP 200 but no XML document; see Response.",
+            error.Message);
+    }
+
+    [Fact]
+    public void NoDocumentHasTheStandardConstructors()
+    {
+        var plain = new Pain001NoDocumentException();
+        Assert.Equal("The pain001 API answered generate without an XML document.", plain.Message);
+        Assert.Null(plain.Response);
+        Assert.Equal(0, plain.StatusCode);
+        Assert.Equal("m", new Pain001NoDocumentException("m").Message);
+        var inner = new InvalidOperationException("cause");
+        Assert.Same(inner, new Pain001NoDocumentException("m", inner).InnerException);
+        Assert.Throws<ArgumentNullException>(() => new Pain001NoDocumentException(200, null!));
+    }
+
     [Fact]
     public async Task CheckReadsFindings()
     {

@@ -26,10 +26,12 @@ public sealed class ResponsePropertyTests
 
     /// <summary>
     /// Whatever the server sends, a typed method either decodes it or
-    /// raises one of two exceptions: <see cref="Pain001ApiException"/> for
-    /// a status outside 2xx, carrying that status, or
-    /// <see cref="JsonException"/> for a 2xx body that is not the expected
-    /// shape. Nothing else escapes.
+    /// raises one of the documented exceptions:
+    /// <see cref="Pain001ApiException"/> for a status outside 2xx, carrying
+    /// that status; <see cref="JsonException"/> for a 2xx body that is not
+    /// the expected shape; or, from generate only,
+    /// <see cref="Pain001NoDocumentException"/> for a 2xx answer without
+    /// the XML. Nothing else escapes.
     /// </summary>
     [Property(MaxTest = Cases, Arbitrary = [typeof(ServerArbitraries)])]
     public async Task TypedMethodsRaiseOnlyTheDocumentedExceptions(ServerAnswer answer)
@@ -37,7 +39,7 @@ public sealed class ResponsePropertyTests
         foreach (string method in Methods)
         {
             Exception? error = await Record.ExceptionAsync(() => Send(answer, method));
-            AssertDocumentedOutcome(answer.Status, error);
+            AssertDocumentedOutcome(answer.Status, method, error);
         }
     }
 
@@ -126,7 +128,7 @@ public sealed class ResponsePropertyTests
         _ => client.ProjectFaceAsync("uk_open_banking", "<x/>"),
     };
 
-    private static void AssertDocumentedOutcome(int status, Exception? error)
+    private static void AssertDocumentedOutcome(int status, string method, Exception? error)
     {
         bool success = status is >= 200 and <= 299;
         switch (error)
@@ -141,6 +143,10 @@ public sealed class ResponsePropertyTests
                 break;
             case JsonException:
                 Assert.True(success, $"HTTP {status} raised JsonException instead of Pain001ApiException");
+                break;
+            case Pain001NoDocumentException noDocument:
+                Assert.True(success && method == "generate", $"HTTP {status} {method} raised Pain001NoDocumentException");
+                Assert.Equal(status, noDocument.StatusCode);
                 break;
             default:
                 Assert.Fail($"HTTP {status} raised an undocumented {error.GetType()}: {error}");

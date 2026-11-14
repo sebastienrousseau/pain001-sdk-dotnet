@@ -81,6 +81,13 @@ suite; the first release will be `0.0.86`, in lockstep with it.
 
 ### Fixed
 
+- `GenerateAsync` no longer returns a result without a document. A 2xx
+  answer whose `success` is not true, or whose `xml` is missing or
+  empty, now raises `Pain001NoDocumentException` (with the status and
+  the decoded `Response`), as Go returns `ErrNoDocument`, C++ throws
+  `NoDocument` and Rust returns `Error::Decode`. A returned
+  `UiGenerateResponse` therefore always carries the XML.
+
 - A response body that is not valid UTF-8 is kept as text, each invalid
   byte replaced by U+FFFD, as the documentation already promised for a
   body that is not JSON. Before, `Pain001ApiException.Detail` and
