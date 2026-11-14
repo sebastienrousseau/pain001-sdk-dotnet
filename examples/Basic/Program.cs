@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 //
-// Generates a pain.001.001.09 file from the conformance kit's synthetic
-// credit-transfer CSV, through a running `pain001 serve`.
+// Checks a running `pain001 serve`, validates the conformance kit's
+// synthetic credit-transfer CSV and generates a pain.001.001.09 file
+// from it.
 //
 //   dotnet run --project examples/Basic -- [input.csv] [output.xml]
 //
@@ -16,9 +17,19 @@ string output = args.Length > 1 ? args[1] : "credit-transfer.pain.001.001.09.xml
 
 using var client = new Pain001Client(new Uri(baseUrl), Environment.GetEnvironmentVariable("PAIN001_API_KEY"));
 string csv = await File.ReadAllTextAsync(input).ConfigureAwait(false);
+string filename = Path.GetFileName(input);
+
+HealthResponse health = await client.HealthAsync().ConfigureAwait(false);
+Console.WriteLine($"Server {baseUrl}: {health.Status}, pain001 {health.Version}");
+
+ValidationResponse validation = await client
+    .ValidateAsync(csv, filename, MessageTypes.Pain001V09)
+    .ConfigureAwait(false);
+Console.WriteLine(
+    $"Validated {filename}: {validation.ValidRows} of {validation.TotalRows} rows valid");
 
 UiGenerateResponse result = await client
-    .GenerateAsync(csv, Path.GetFileName(input), MessageTypes.Pain001V09)
+    .GenerateAsync(csv, filename, MessageTypes.Pain001V09)
     .ConfigureAwait(false);
 
 if (!result.Success || result.Xml is null)
