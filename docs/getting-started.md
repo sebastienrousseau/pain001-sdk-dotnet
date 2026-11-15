@@ -8,7 +8,7 @@ The SDK calls `pain001 serve`, the REST API of the Python package
 `pain001`. Install it with its `api` extra and start it on loopback:
 
 ```sh
-pip install 'pain001[api]==0.0.87'
+pip install 'pain001[api]==0.0.88'
 pain001 serve --host 127.0.0.1 --port 8000
 ```
 
