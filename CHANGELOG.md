@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This package's version follows the [`pain001`](https://github.com/sebastienrousseau/pain001)
 suite; the first release will be `0.0.88`, in lockstep with it.
 
+## [Unreleased]
+
+### Fixed
+
+- The release notes' Checksums block lists `SHA256SUMS` itself, as
+  it is an attached asset; the 0.0.88 notes left it out, and the
+  family's ecosystem audit requires every asset to be listed.
+
 ## [0.0.88] - 2026-11-14
 
 ### Changed
