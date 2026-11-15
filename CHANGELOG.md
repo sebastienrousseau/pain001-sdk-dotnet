@@ -11,6 +11,8 @@ suite; the first release will be `0.0.88`, in lockstep with it.
 
 ## [Unreleased]
 
+## [0.0.89] - Unreleased
+
 ### Fixed
 
 - The release notes' Checksums block lists `SHA256SUMS` itself, as
