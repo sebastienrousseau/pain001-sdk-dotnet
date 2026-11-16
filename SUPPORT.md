@@ -48,7 +48,7 @@ the latest `0.0.x` receives fixes.
 
 | Version | Status | Supported |
 | :--- | :--- | :--- |
-| `0.0.88` | Unreleased, in development | Yes, once released |
+| `0.0.88` | Current | Yes |
 
 ## Response times
 

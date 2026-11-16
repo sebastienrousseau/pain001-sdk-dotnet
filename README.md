@@ -65,9 +65,8 @@
 <PackageReference Include="Pain001.Sdk" Version="0.0.88" />
 ```
 
-Or `dotnet add package Pain001.Sdk --version 0.0.88`. 0.0.88 is the
-first release; until it is on NuGet, reference the project from a
-clone:
+Or `dotnet add package Pain001.Sdk --version 0.0.88`. To build against
+a clone instead, reference the project:
 
 ```xml
 <ProjectReference Include="path/to/pain001-sdk-dotnet/src/Pain001.Sdk/Pain001.Sdk.csproj" />
@@ -152,7 +151,7 @@ proves each client against a running server.
 | Faces | `FacesAsync`, `ProjectFaceAsync`: project a pain.001 into another format, with a loss report | Available |
 | Low level | `RequestAsync`: any method and path, status and raw JSON | Available |
 | Resilience | Per-request timeout, cancellation, opt-in `RetryPolicy` for `GET` calls | Available |
-| Publication | NuGet package `Pain001.Sdk` | Release workflow ready; first publication with 0.0.88 |
+| Publication | NuGet package `Pain001.Sdk` | Published on nuget.org since 0.0.88 |
 
 ---
 

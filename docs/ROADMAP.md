@@ -8,7 +8,7 @@ client itself. It is a plan, not a promise; the
 [CHANGELOG](https://github.com/sebastienrousseau/pain001-sdk-dotnet/blob/main/CHANGELOG.md)
 records what shipped.
 
-## 0.0.88 (this release)
+## 0.0.88 (released 2026-11-14)
 
 - First NuGet release of `Pain001.Sdk`, by trusted publishing, once the
   `Pain001.` package prefix reservation is granted.

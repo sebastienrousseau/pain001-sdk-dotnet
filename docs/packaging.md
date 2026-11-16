@@ -6,7 +6,7 @@
 
 | Item | Value |
 | :--- | :--- |
-| Package | [`Pain001.Sdk`](https://www.nuget.org/packages/Pain001.Sdk) (not yet published) |
+| Package | [`Pain001.Sdk`](https://www.nuget.org/packages/Pain001.Sdk), first published with 0.0.88 |
 | Target | `net10.0` |
 | Licence | `Apache-2.0 OR MIT` (SPDX expression in the package) |
 | Runtime dependencies | None |

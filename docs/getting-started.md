@@ -23,8 +23,7 @@ the client.
 dotnet add package Pain001.Sdk --version 0.0.88
 ```
 
-Until the first release is on NuGet, reference the project from a clone
-instead:
+To build against a clone instead, reference the project:
 
 ```xml
 <ItemGroup>
