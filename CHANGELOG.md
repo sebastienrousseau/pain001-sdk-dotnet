@@ -13,6 +13,11 @@ suite; the first release was `0.0.88`, in lockstep with it.
 
 ## [0.0.89] - Unreleased
 
+### Changed
+
+- The test-only `coverlet.msbuild` package moves to 10.1.1 (was
+  10.1.0).
+
 ### Fixed
 
 - The release notes' Checksums block lists `SHA256SUMS` itself, as
