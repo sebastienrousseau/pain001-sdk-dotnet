@@ -11,15 +11,21 @@ suite; the first release was `0.0.88`, in lockstep with it.
 
 ## [Unreleased]
 
-## [0.0.89] - 2026-11-16
+## [0.0.90] - 2026-11-16
 
-In lockstep with pain001 0.0.89.
+In lockstep with pain001 0.0.90.
+
+0.0.89 was not released for .NET: core 0.0.89's server failed the
+conformance kit under parallel requests (HTTP 500 from a race in its
+lazy module loading), which core 0.0.90 fixes. The SDK goes from
+0.0.88 to 0.0.90, and this section holds everything prepared for
+0.0.89.
 
 ### Changed
 
-- CI tests against pain001 0.0.89, the release this SDK ships with
+- CI tests against pain001 0.0.90, the release this SDK ships with
   (`ci/server-requirements.in`). The vendored conformance kit is
-  unchanged: core 0.0.89 ships the same kit as 0.0.88.
+  unchanged: core 0.0.90 ships the same kit as 0.0.88.
 - The API compatibility check now has a baseline: `scripts/api-compat.sh`
   compares the public API with the published `Pain001.Sdk` 0.0.88, so a
   breaking change fails the build.
