@@ -11,10 +11,18 @@ suite; the first release was `0.0.88`, in lockstep with it.
 
 ## [Unreleased]
 
-## [0.0.89] - Unreleased
+## [0.0.89] - 2026-11-16
+
+In lockstep with pain001 0.0.89.
 
 ### Changed
 
+- CI tests against pain001 0.0.89, the release this SDK ships with
+  (`ci/server-requirements.in`). The vendored conformance kit is
+  unchanged: core 0.0.89 ships the same kit as 0.0.88.
+- The API compatibility check now has a baseline: `scripts/api-compat.sh`
+  compares the public API with the published `Pain001.Sdk` 0.0.88, so a
+  breaking change fails the build.
 - The test-only `coverlet.msbuild` package moves to 10.1.1 (was
   10.1.0).
 
@@ -23,6 +31,8 @@ suite; the first release was `0.0.88`, in lockstep with it.
 - The release notes' Checksums block lists `SHA256SUMS` itself, as
   it is an attached asset; the 0.0.88 notes left it out, and the
   family's ecosystem audit requires every asset to be listed.
+- The README, SECURITY.md, SUPPORT.md and the manual no longer say the
+  package is unreleased: 0.0.88 is on nuget.org.
 
 ## [0.0.88] - 2026-11-14
 
