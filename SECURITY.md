@@ -11,7 +11,8 @@ security fixes; older `0.0.x` versions do not. The first release was
 
 | Version | Status | Receives security fixes? |
 | :--- | :--- | :--- |
-| `0.0.88` | Current | Yes |
+| `0.0.89` | Current | Yes |
+| `0.0.88` | Superseded | No |
 
 ## Reporting a vulnerability
 

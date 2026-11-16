@@ -17,7 +17,7 @@
 Install it with:
 
 ```sh
-dotnet add package Pain001.Sdk --version 0.0.88
+dotnet add package Pain001.Sdk --version 0.0.89
 ```
 
 Every release attaches, besides the `.nupkg` and `.snupkg`, a CycloneDX
@@ -26,11 +26,11 @@ downloaded package with:
 
 ```sh
 sha256sum --check --ignore-missing SHA256SUMS
-gh attestation verify Pain001.Sdk.0.0.88.nupkg --repo sebastienrousseau/pain001-sdk-dotnet
+gh attestation verify Pain001.Sdk.0.0.89.nupkg --repo sebastienrousseau/pain001-sdk-dotnet
 ```
 
 NuGet also signs every package it accepts with its repository
-signature (`dotnet nuget verify Pain001.Sdk.0.0.88.nupkg`).
+signature (`dotnet nuget verify Pain001.Sdk.0.0.89.nupkg`).
 
 ## Version pinning
 

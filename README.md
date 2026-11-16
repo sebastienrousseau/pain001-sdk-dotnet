@@ -62,10 +62,10 @@
 ### As a .NET library
 
 ```xml
-<PackageReference Include="Pain001.Sdk" Version="0.0.88" />
+<PackageReference Include="Pain001.Sdk" Version="0.0.89" />
 ```
 
-Or `dotnet add package Pain001.Sdk --version 0.0.88`. To build against
+Or `dotnet add package Pain001.Sdk --version 0.0.89`. To build against
 a clone instead, reference the project:
 
 ```xml

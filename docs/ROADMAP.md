@@ -8,6 +8,12 @@ client itself. It is a plan, not a promise; the
 [CHANGELOG](https://github.com/sebastienrousseau/pain001-sdk-dotnet/blob/main/CHANGELOG.md)
 records what shipped.
 
+## 0.0.89 (this release)
+
+- The API compatibility check (ApiCompat package validation) runs
+  against the published 0.0.88 package on every pull request.
+- CI tests against pain001 0.0.89 and the kit vendored from it.
+
 ## 0.0.88 (released 2026-11-14)
 
 - First NuGet release of `Pain001.Sdk`, by trusted publishing, once the
@@ -21,8 +27,6 @@ records what shipped.
 
 ## Next
 
-- Run the API compatibility check (ApiCompat package validation)
-  against the published 0.0.88 package from the next release on.
 - Typed methods for endpoints the server adds, in the release that adds
   them; until then `RequestAsync` reaches any endpoint.
 - Keep the kit current: each suite release vendors core's kit and runs
