@@ -20,7 +20,7 @@ the client.
 ## 2. Add the package
 
 ```sh
-dotnet add package Pain001.Sdk --version 0.0.89
+dotnet add package Pain001.Sdk --version 0.0.90
 ```
 
 To build against a clone instead, reference the project:
