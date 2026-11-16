@@ -8,7 +8,7 @@ The SDK calls `pain001 serve`, the REST API of the Python package
 `pain001`. Install it with its `api` extra and start it on loopback:
 
 ```sh
-pip install 'pain001[api]==0.0.88'
+pip install 'pain001[api]==0.0.90'
 pain001 serve --host 127.0.0.1 --port 8000
 ```
 
@@ -20,11 +20,10 @@ the client.
 ## 2. Add the package
 
 ```sh
-dotnet add package Pain001.Sdk --version 0.0.88
+dotnet add package Pain001.Sdk --version 0.0.90
 ```
 
-Until the first release is on NuGet, reference the project from a clone
-instead:
+To build against a clone instead, reference the project:
 
 ```xml
 <ItemGroup>

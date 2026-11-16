@@ -7,7 +7,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 This package's version follows the [`pain001`](https://github.com/sebastienrousseau/pain001)
-suite; the first release will be `0.0.88`, in lockstep with it.
+suite; the first release was `0.0.88`, in lockstep with it.
+
+## [Unreleased]
+
+## [0.0.90] - 2026-11-16
+
+In lockstep with pain001 0.0.90.
+
+0.0.89 was not released for .NET: core 0.0.89's server failed the
+conformance kit under parallel requests (HTTP 500 from a race in its
+lazy module loading), which core 0.0.90 fixes. The SDK goes from
+0.0.88 to 0.0.90, and this section holds everything prepared for
+0.0.89.
+
+### Changed
+
+- CI tests against pain001 0.0.90, the release this SDK ships with
+  (`ci/server-requirements.in`). The vendored conformance kit is
+  unchanged: core 0.0.90 ships the same kit as 0.0.88.
+- The API compatibility check now has a baseline: `scripts/api-compat.sh`
+  compares the public API with the published `Pain001.Sdk` 0.0.88, so a
+  breaking change fails the build.
+- The test-only `coverlet.msbuild` package moves to 10.1.1 (was
+  10.1.0).
+
+### Fixed
+
+- The release notes' Checksums block lists `SHA256SUMS` itself, as
+  it is an attached asset; the 0.0.88 notes left it out, and the
+  family's ecosystem audit requires every asset to be listed.
+- The README, SECURITY.md, SUPPORT.md and the manual no longer say the
+  package is unreleased: 0.0.88 is on nuget.org.
 
 ## [0.0.88] - 2026-11-14
 

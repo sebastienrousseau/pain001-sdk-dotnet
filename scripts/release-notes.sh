@@ -17,6 +17,13 @@
 # on an em dash anywhere in the notes.
 set -euo pipefail
 
+# SHA256SUMS is attached too, so its own hash belongs in the block.
+sums_self() {
+  local h
+  h=$( (sha256sum "$1" 2>/dev/null || shasum -a 256 "$1") | cut -d" " -f1)
+  printf "%s  SHA256SUMS\n" "$h"
+}
+
 version="${1:?usage: release-notes.sh <version> <dist-dir>}"
 dist="${2:?usage: release-notes.sh <version> <dist-dir>}"
 repo="${GITHUB_REPOSITORY:-sebastienrousseau/pain001-sdk-dotnet}"
@@ -90,6 +97,7 @@ notes=$(
   echo
   echo '```text'
   (cd "$dist" && find . -maxdepth 1 -type f ! -name SHA256SUMS | sed 's|^\./||' | LC_ALL=C sort | xargs sha256sum)
+  sums_self "$dist/SHA256SUMS"
   echo '```'
   echo
   echo "**Full Changelog**: $full"

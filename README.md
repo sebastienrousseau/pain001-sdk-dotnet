@@ -62,12 +62,11 @@
 ### As a .NET library
 
 ```xml
-<PackageReference Include="Pain001.Sdk" Version="0.0.88" />
+<PackageReference Include="Pain001.Sdk" Version="0.0.90" />
 ```
 
-Or `dotnet add package Pain001.Sdk --version 0.0.88`. 0.0.88 is the
-first release; until it is on NuGet, reference the project from a
-clone:
+Or `dotnet add package Pain001.Sdk --version 0.0.90`. To build against
+a clone instead, reference the project:
 
 ```xml
 <ProjectReference Include="path/to/pain001-sdk-dotnet/src/Pain001.Sdk/Pain001.Sdk.csproj" />
@@ -77,7 +76,7 @@ The SDK calls a running pain001 server, the Python package `pain001`
 with its `api` extra:
 
 ```sh
-pip install 'pain001[api]==0.0.88'
+pip install 'pain001[api]==0.0.90'
 pain001 serve --host 127.0.0.1 --port 8000
 ```
 
@@ -89,7 +88,7 @@ pain001 serve --host 127.0.0.1 --port 8000
   .NET 8 and .NET 9 reached end of support on 10 November 2026 and are
   not targeted ([policy](docs/POLICIES.md)).
 - No other package: the library depends on the base class library only.
-- A pain001 server reachable over HTTP. CI tests against pain001 0.0.88,
+- A pain001 server reachable over HTTP. CI tests against pain001 0.0.90,
   the latest released core.
 - CI builds and tests on Linux, Windows and macOS.
 
@@ -152,7 +151,7 @@ proves each client against a running server.
 | Faces | `FacesAsync`, `ProjectFaceAsync`: project a pain.001 into another format, with a loss report | Available |
 | Low level | `RequestAsync`: any method and path, status and raw JSON | Available |
 | Resilience | Per-request timeout, cancellation, opt-in `RetryPolicy` for `GET` calls | Available |
-| Publication | NuGet package `Pain001.Sdk` | Release workflow ready; first publication with 0.0.88 |
+| Publication | NuGet package `Pain001.Sdk` | Published on nuget.org since 0.0.88 |
 
 ---
 

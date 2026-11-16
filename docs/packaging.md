@@ -6,7 +6,7 @@
 
 | Item | Value |
 | :--- | :--- |
-| Package | [`Pain001.Sdk`](https://www.nuget.org/packages/Pain001.Sdk) (not yet published) |
+| Package | [`Pain001.Sdk`](https://www.nuget.org/packages/Pain001.Sdk), first published with 0.0.88 |
 | Target | `net10.0` |
 | Licence | `Apache-2.0 OR MIT` (SPDX expression in the package) |
 | Runtime dependencies | None |
@@ -17,7 +17,7 @@
 Install it with:
 
 ```sh
-dotnet add package Pain001.Sdk --version 0.0.88
+dotnet add package Pain001.Sdk --version 0.0.90
 ```
 
 Every release attaches, besides the `.nupkg` and `.snupkg`, a CycloneDX
@@ -26,11 +26,11 @@ downloaded package with:
 
 ```sh
 sha256sum --check --ignore-missing SHA256SUMS
-gh attestation verify Pain001.Sdk.0.0.88.nupkg --repo sebastienrousseau/pain001-sdk-dotnet
+gh attestation verify Pain001.Sdk.0.0.90.nupkg --repo sebastienrousseau/pain001-sdk-dotnet
 ```
 
 NuGet also signs every package it accepts with its repository
-signature (`dotnet nuget verify Pain001.Sdk.0.0.88.nupkg`).
+signature (`dotnet nuget verify Pain001.Sdk.0.0.90.nupkg`).
 
 ## Version pinning
 
