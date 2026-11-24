@@ -11,6 +11,14 @@ suite; the first release was `0.0.88`, in lockstep with it.
 
 ## [Unreleased]
 
+### Security
+
+- The manual builds with mkdocs-material 9.8.2 (was 9.8.0), which fixes
+  GHSA-wxw8-4jgj-q85j, a path traversal in its privacy plugin that
+  affects 9.5.12 to 9.8.1; pymdown-extensions moves to 13.1.2.
+  Dependabot now watches `docs/`, which it did not, so this was never
+  offered.
+
 ### Changed
 
 - The build-time `SonarAnalyzer.CSharp` analyser moves to 10.37.0.15768
