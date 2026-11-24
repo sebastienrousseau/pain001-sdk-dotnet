@@ -8,7 +8,13 @@ client itself. It is a plan, not a promise; the
 [CHANGELOG](https://github.com/sebastienrousseau/pain001-sdk-dotnet/blob/main/CHANGELOG.md)
 records what shipped.
 
-## 0.0.90 (this release)
+## 0.0.91 (this release)
+
+- In lockstep with pain001 0.0.91; CI tests against that server once
+  it is on PyPI. The API compatibility check compares with the
+  published 0.0.90 package.
+
+## 0.0.90 (released 2026-11-16)
 
 - The API compatibility check (ApiCompat package validation) runs
   against the published 0.0.88 package on every pull request.

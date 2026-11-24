@@ -19,7 +19,7 @@
          adds the last published version as the baseline. -->
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageId>Pain001.Sdk</PackageId>
-    <Version>0.0.90</Version>
+    <Version>0.0.91</Version>
     <Authors>Sebastien Rousseau</Authors>
     <Description>Typed .NET client for the pain001 REST API (pain001 serve): validate, generate and check ISO 20022 pain.001 and pain.008 payment files.</Description>
     <PackageLicenseExpression>Apache-2.0 OR MIT</PackageLicenseExpression>
