@@ -11,6 +11,15 @@ suite; the first release was `0.0.88`, in lockstep with it.
 
 ## [Unreleased]
 
+### Changed
+
+- The build-time `SonarAnalyzer.CSharp` analyser moves to 10.37.0.15768
+  (was 10.36.0.15337). It raises no new warnings under the enabled
+  complexity rules.
+- The `cyclonedx` SBOM tool moves to 6.3.2 (was 6.3.1).
+- CI uses `ossf/scorecard-action` 2.6.0 (was 2.5.0), pinned by
+  commit SHA.
+
 ## [0.0.90] - 2026-11-16
 
 In lockstep with pain001 0.0.90.
