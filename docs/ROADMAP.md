@@ -8,11 +8,11 @@ client itself. It is a plan, not a promise; the
 [CHANGELOG](https://github.com/sebastienrousseau/pain001-sdk-dotnet/blob/main/CHANGELOG.md)
 records what shipped.
 
-## 0.0.91 (this release)
+## 0.0.91 (released 2026-11-25)
 
-- In lockstep with pain001 0.0.91; CI tests against that server once
-  it is on PyPI. The API compatibility check compares with the
-  published 0.0.90 package.
+- In lockstep with pain001 0.0.91; CI tests against that server. The
+  API compatibility check compares with the published 0.0.90 package.
+- The manual builds with mkdocs-material 9.8.2 (GHSA-wxw8-4jgj-q85j).
 
 ## 0.0.90 (released 2026-11-16)
 
