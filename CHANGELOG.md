@@ -11,6 +11,10 @@ suite; the first release was `0.0.88`, in lockstep with it.
 
 ## [Unreleased]
 
+## [0.0.91] - 2026-11-25
+
+In lockstep with pain001 0.0.91.
+
 ### Security
 
 - The manual builds with mkdocs-material 9.8.2 (was 9.8.0), which fixes
@@ -25,8 +29,12 @@ suite; the first release was `0.0.88`, in lockstep with it.
   (was 10.36.0.15337). It raises no new warnings under the enabled
   complexity rules.
 - The `cyclonedx` SBOM tool moves to 6.3.2 (was 6.3.1).
-- CI uses `ossf/scorecard-action` 2.6.0 (was 2.5.0), pinned by
-  commit SHA.
+- CI uses `ossf/scorecard-action` 2.6.0 (was 2.5.0) and
+  `github/codeql-action` 4.39.4 (was 4.39.3), pinned by commit SHA.
+- The manual's `mkdocs-include-markdown-plugin` moves to 7.3.2 (was
+  7.3.0).
+- CI's conformance server is pain001 0.0.91 (was 0.0.90), pinned in
+  `ci/server-requirements.in`.
 
 ## [0.0.90] - 2026-11-16
 
