@@ -8,4 +8,4 @@ mkdocs-material==9.8.2
 # Pulled in by mkdocs-material; 13.1.1 fixes StripHTML matching attribute
 # names case sensitively.
 pymdown-extensions>=13.1.1
-mkdocs-include-markdown-plugin==7.3.0
+mkdocs-include-markdown-plugin==7.3.2
